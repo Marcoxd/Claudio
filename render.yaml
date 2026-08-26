@@ -1,0 +1,34 @@
+# Despliegue en Render (plan gratuito).
+# 1. Sube este repo a GitHub.
+# 2. En Render: New → Blueprint → elige el repo.
+# 3. Llena las variables marcadas como sync:false.
+services:
+  - type: web
+    name: kuri
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: APP_NAME
+        value: Kuri
+      - key: TIMEZONE
+        value: America/Guayaquil
+      - key: CURRENCY
+        value: USD
+      - key: TELEGRAM_TOKEN
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: BASE_URL
+        sync: false
+      - key: TELEGRAM_WEBHOOK_SECRET
+        generateValue: true
+      - key: DASHBOARD_TOKEN
+        generateValue: true
