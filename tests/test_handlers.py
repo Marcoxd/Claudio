@@ -37,6 +37,17 @@ class FakeMessage:
         return True
 
 
+class FakeCallback:
+    def __init__(self, data: str, message: FakeMessage):
+        self.data = data
+        self.message = message
+        self.from_user = SimpleNamespace(id=1)
+        self.answers: list = []
+
+    async def answer(self, text: str = "", **kwargs):
+        self.answers.append(text)
+
+
 @pytest.fixture
 async def poblado(session):
     session.add(Account(name="Visa", type=ACCOUNT_CREDIT, cut_day=20, due_day=10,
@@ -125,3 +136,58 @@ async def test_pagar_tarjeta_inexistente(poblado):
     m = FakeMessage("/pagar mastercard 100")
     await cards_h.cmd_pay(m, poblado)
     assert "No encontré esa tarjeta" in m.sent[0]
+
+
+async def test_corte_dice_en_que_mes_cae_lo_de_hoy(poblado):
+    m = FakeMessage("/corte")
+    await cards_h.cmd_cuts(m, poblado)
+    assert "Visa" in m.sent[0]
+    assert "entra al corte" in m.sent[0]
+
+
+async def test_corte_sin_tarjetas(session):
+    m = FakeMessage("/corte")
+    await cards_h.cmd_cuts(m, session)
+    assert "/nuevatarjeta" in m.sent[0]
+
+
+async def test_detalle_del_corte_lista_los_movimientos(poblado):
+    import datetime as dt
+
+    from sqlalchemy import select
+
+    from app.models import STATUS_DONE, Account, Transaction
+    from app.services.cards import build_installments
+
+    card = (
+        await poblado.execute(select(Account).where(Account.name == "Visa"))
+    ).scalar_one()
+    tx = Transaction(
+        kind="expense", status=STATUS_DONE, date=dt.date(2026, 8, 4),
+        period="2026-08", amount=D("60.00"), description="Supermaxi",
+        account_id=card.id,
+    )
+    poblado.add(tx)
+    await poblado.flush()
+    for inst in build_installments(tx, card, 1):
+        poblado.add(inst)
+    await poblado.flush()
+
+    m = FakeMessage()
+    await cards_h.cb_statement_detail(FakeCallback(f"c:det:{card.id}:2026-08", m), poblado)
+    assert "Supermaxi" in m.sent[0]
+    assert "$60.00" in m.sent[0]
+    assert "Cierra el" in m.sent[0]
+
+
+async def test_detalle_de_corte_vacio(poblado):
+    from sqlalchemy import select
+
+    from app.models import Account
+
+    card = (
+        await poblado.execute(select(Account).where(Account.name == "Visa"))
+    ).scalar_one()
+    m = FakeMessage()
+    await cards_h.cb_statement_detail(FakeCallback(f"c:det:{card.id}:2027-01", m), poblado)
+    assert "No hay movimientos" in m.sent[0]

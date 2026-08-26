@@ -28,9 +28,16 @@ Studio, tier gratuito).
 **Tarjetas de crédito de verdad**
 - Día de **corte** y día de **pago** por tarjeta: sabe si una compra cae en este
   corte o en el siguiente.
+- **Al anotar el gasto te dice a qué mes va**, antes de que confirmes:
+  *«Va al corte del 20 sep, lo pagas el 10 oct»*.
+- `/corte` responde la pregunta de todos los días: *si compro hoy, ¿en qué mes
+  me lo cobran?* — tarjeta por tarjeta, y te avisa si el corte es en 3 días.
 - **Diferidos**: reparte las cuotas mes a mes y te dice cuánto tienes
   comprometido en los próximos meses.
-- `/tarjetas` te dice cuánto pagar, cuándo vence y cuánto cupo te queda.
+- `/tarjetas` te dice cuánto pagar, cuándo vence y cuánto cupo te queda; desde
+  ahí abres el **detalle de un corte** (qué compras entraron, con sus fechas) o
+  le **cambias las fechas** a una tarjeta.
+- `/nuevatarjeta` agrega una sin volver a pasar por `/setup`.
 
 **Cuentas compartidas**
 - `cena 96 con Ana y Luis` → divide en partes iguales.
@@ -52,6 +59,8 @@ Studio, tier gratuito).
 **Panel web**
 - Cuánto te queda para gastar este mes (lo más importante, arriba y grande).
 - Ingresos vs. gastos, en qué se te va la plata, tarjetas, deudas, colchón.
+- Por tarjeta: qué rango de compras cubre el corte que estás pagando, la lista
+  de movimientos que entraron y a qué corte irá lo que compres hoy.
 - Modo claro y oscuro, funciona en el celular.
 - Sin pedir nada a servidores externos: ni fuentes, ni scripts, ni CDNs.
 

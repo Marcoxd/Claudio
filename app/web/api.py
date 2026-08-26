@@ -13,14 +13,20 @@ from app.config import settings
 from app.db import SessionLocal
 from app.money import ZERO
 from app.services import buffer as buffer_service
-from app.services.cards import card_balance, future_commitments
-from app.services.format import money, pct
-from app.services.periods import add_months, current_period, period_label
+from app.services.cards import (
+    card_balance,
+    future_commitments,
+    place_purchase,
+    statement_window,
+)
+from app.services.format import money, pct, period_short
+from app.services.periods import add_months, current_period, period_label, today
 from app.services.reports import cashflow, month_report, recent_transactions
 from app.services.splits import balances
 
 TEMPLATES = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
 TEMPLATES.env.filters["money"] = money
+TEMPLATES.env.filters["mes"] = period_short
 
 router = APIRouter()
 
@@ -62,12 +68,17 @@ async def dashboard(
     flow = await cashflow(session, months=6, end=period)
     debts = await balances(session)
     recent = await recent_transactions(session, limit=25)
+    statement_of = {
+        tx.id: tx.installments[0].statement_period for tx in recent if tx.installments
+    }
     buffer_state = await buffer_service.state(session)
 
     cards = []
     for summary in report.statements:
         card = summary.account
         used = await card_balance(session, card)
+        window = statement_window(summary.period, card.cut_day or 0)
+        hoy = place_purchase(card, today(), ZERO, 1)
         cards.append(
             {
                 "name": card.name,
@@ -77,12 +88,26 @@ async def dashboard(
                 "others": summary.others_share,
                 "cut": summary.cut_date,
                 "due": summary.due_date,
+                "cut_day": card.cut_day,
+                "due_day": card.due_day,
+                "window": window,
                 "days_left": summary.days_left,
                 "overdue": summary.is_overdue,
                 "limit": card.credit_limit,
                 "used": used,
                 "used_pct": pct(used, card.credit_limit) if card.credit_limit else None,
                 "future": await future_commitments(session, card, period, months=6),
+                "today_cut": hoy.cut_date if hoy else None,
+                "today_due": hoy.due_date if hoy else None,
+                "movements": [
+                    {
+                        "date": i.transaction.date if i.transaction else summary.cut_date,
+                        "label": (i.transaction.description if i.transaction else "Movimiento"),
+                        "installment": f"{i.number}/{i.count}" if i.count > 1 else "",
+                        "amount": i.amount,
+                    }
+                    for i in summary.installments
+                ],
             }
         )
 
@@ -115,6 +140,7 @@ async def dashboard(
         "flow": flow,
         "debts": debts,
         "recent": recent,
+        "statement_of": statement_of,
         "buffer": buffer_state,
         "chart": _line_chart(flow),
         "token": token,

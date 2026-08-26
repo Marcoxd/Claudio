@@ -26,6 +26,7 @@ def welcome_text() -> str:
         "<b>Comandos</b>\n"
         "/resumen — cómo va el mes\n"
         "/tarjetas — cortes, cuotas y cuánto pagar\n"
+        "/corte — en qué mes cae lo que compres hoy\n"
         "/fijos — arriendo, internet, préstamos…\n"
         "/deudas — quién te debe de las salidas\n"
         "/colchon — el dinero que no es tuyo\n"
@@ -57,8 +58,13 @@ qué consumió cada quien: el IVA y la propina se reparten solos.
 <code>repuse 50 al colchón</code>
 
 <b>Tarjetas</b>
-/tarjetas te dice cuánto cae en cada corte y cuándo vence.
-Los diferidos se reparten mes a mes automáticamente.
+/tarjetas te dice cuánto pagar en cada corte y cuándo vence; desde ahí puedes
+ver los movimientos de un corte o cambiarle las fechas.
+/corte te dice, para cada tarjeta, en qué mes va a caer lo que compres hoy.
+/nuevatarjeta agrega una.
+
+Al anotar un gasto con tarjeta te digo al instante a qué corte entra y cuándo
+lo pagas, antes de que confirmes. Los diferidos se reparten mes a mes solos.
 
 <b>Recibos</b>
 Foto o PDF: leo comercio, fecha, total e ítems. Puedes mandar la foto con un

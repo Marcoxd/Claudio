@@ -202,9 +202,12 @@ async def cashflow(session: AsyncSession, months: int = 6, end: str | None = Non
 
 
 async def recent_transactions(session: AsyncSession, limit: int = 20) -> list[Transaction]:
+    from sqlalchemy.orm import selectinload
+
     rows = (
         await session.execute(
             select(Transaction)
+            .options(selectinload(Transaction.installments))
             .where(Transaction.status == STATUS_DONE)
             .order_by(Transaction.date.desc(), Transaction.id.desc())
             .limit(limit)

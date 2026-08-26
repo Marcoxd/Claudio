@@ -37,9 +37,33 @@ def row(label: str, value: str, width: int = 30) -> str:
     return f"{label}{' ' * max(1, width - len(label) - len(value))}{value}"
 
 
+def period_short(period: str) -> str:
+    """'2026-09' → 'sep 26'."""
+    year, month = period.split("-")
+    return f"{MONTHS_ES[int(month) - 1][:3]} {year[2:]}"
+
+
 def block(rows: list[str]) -> str:
     """Bloque monoespaciado (Telegram alinea las columnas dentro de <pre>)."""
     return "<pre>" + "\n".join(rows) + "</pre>"
+
+
+def placement_text(placement, account_name: str = "") -> str:
+    """Explica en qué corte cae una compra con tarjeta."""
+    if placement is None:
+        return ""
+    if placement.is_deferred:
+        return (
+            f"{placement.count} cuotas de {money(placement.installment_amount)}, "
+            f"del corte de {period_label(placement.period).lower()} "
+            f"al de {period_label(placement.last_period).lower()}.\n"
+            f"La primera la pagas el {date_es(placement.due_date)}."
+        )
+    return (
+        f"Va al corte del {date_es(placement.cut_date)}"
+        f"{f' de {account_name}' if account_name else ''}, "
+        f"lo pagas el {date_es(placement.due_date)}."
+    )
 
 
 def draft_summary(payload: dict, category_name: str, account_name: str,
@@ -62,7 +86,9 @@ def draft_summary(payload: dict, category_name: str, account_name: str,
         detail.append(account_name)
     lines.append(" · ".join(detail))
 
-    if int(payload.get("installments") or 1) > 1:
+    if payload.get("placement"):
+        lines += ["", payload["placement"]]
+    elif int(payload.get("installments") or 1) > 1:
         n = int(payload["installments"])
         lines.append(f"Diferido a {n} meses · {money(D(payload['amount']) / n)} al mes")
 

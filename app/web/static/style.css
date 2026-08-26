@@ -207,6 +207,10 @@ details.data summary::-webkit-details-marker { display: none; }
 details.data summary::before { content: "→ "; }
 details[open].data summary::before { content: "↓ "; }
 details.data > .scroll { margin-top: 14px; }
+details.data.cut { margin-top: 14px; padding-top: 12px; }
+details.data.cut td { padding: 7px 12px 7px 0; font-size: 13px; }
+
+.cc-meta.hoy { margin-top: 12px; font-style: italic; }
 
 /* --------------------------------------------------------------- barras */
 

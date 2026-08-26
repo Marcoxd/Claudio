@@ -54,6 +54,13 @@ def cut_date_for(statement_period: str, cut_day: int) -> dt.date:
     return clamp_day(year, month, cut_day)
 
 
+def statement_window(statement_period: str, cut_day: int) -> tuple[dt.date, dt.date]:
+    """Rango de fechas que abarca un corte: del día siguiente al corte anterior."""
+    end = cut_date_for(statement_period, cut_day)
+    previous = cut_date_for(add_months(statement_period, -1), cut_day)
+    return previous + dt.timedelta(days=1), end
+
+
 def due_date_for(statement_period: str, cut_day: int, due_day: int) -> dt.date:
     """Fecha máxima de pago del estado de cuenta que cierra en `statement_period`."""
     year, month = parse_period(statement_period)
@@ -91,6 +98,48 @@ def build_installments(
             )
         )
     return out
+
+
+@dataclass
+class Placement:
+    """Dónde cae una compra: en qué corte entra y cuándo se paga."""
+
+    period: str
+    cut_date: dt.date
+    due_date: dt.date
+    count: int
+    last_period: str
+    last_due_date: dt.date
+    installment_amount: Decimal
+
+    @property
+    def is_deferred(self) -> bool:
+        return self.count > 1
+
+
+def place_purchase(
+    account: Account, date: dt.date, amount: Decimal, count: int = 1
+) -> Placement | None:
+    """Calcula el corte de una compra sin necesidad de guardarla.
+
+    Sirve para decirle al usuario, antes de confirmar, en qué mes le van a
+    cobrar lo que acaba de anotar.
+    """
+    if account.type != ACCOUNT_CREDIT:
+        return None
+    cut, due = cut_day_of(account), due_day_of(account)
+    count = max(1, int(count or 1))
+    period = statement_period_for(date, cut)
+    last = add_months(period, count - 1)
+    return Placement(
+        period=period,
+        cut_date=cut_date_for(period, cut),
+        due_date=due_date_for(period, cut, due),
+        count=count,
+        last_period=last,
+        last_due_date=due_date_for(last, cut, due),
+        installment_amount=split_evenly(D(amount), count)[0] if amount else ZERO,
+    )
 
 
 @dataclass
@@ -138,6 +187,10 @@ async def statement(
             .order_by(Installment.id)
         )
     ).scalars().all()
+    rows = sorted(
+        rows,
+        key=lambda i: (i.transaction.date if i.transaction else dt.date.min, i.id),
+    )
 
     payments = (
         await session.execute(

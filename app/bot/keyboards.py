@@ -141,18 +141,59 @@ def item_assign(draft_id: int, items: list[dict], index: int,
 
 
 def card_actions(statements) -> InlineKeyboardMarkup:
+    rows = []
+    for s in statements:
+        line = [
+            InlineKeyboardButton(
+                text=f"{s.account.name[:14]} · ver corte",
+                callback_data=f"c:det:{s.account.id}:{s.period}",
+            )
+        ]
+        if s.to_pay > 0:
+            line.append(
+                InlineKeyboardButton(
+                    text=f"pagar {money(s.to_pay)}",
+                    callback_data=f"c:pay:{s.account.id}:{s.period}",
+                )
+            )
+        rows.append(line)
+    rows.append(
+        [
+            InlineKeyboardButton(text="Próximos meses", callback_data="c:future"),
+            InlineKeyboardButton(text="Editar fechas", callback_data="c:cards"),
+        ]
+    )
+    return InlineKeyboardMarkup(inline_keyboard=rows)
+
+
+def card_list(cards) -> InlineKeyboardMarkup:
+    """Elegir qué tarjeta editar."""
     rows = [
         [
             InlineKeyboardButton(
-                text=f"💵 Pagar {s.account.name} ({money(s.to_pay)})",
-                callback_data=f"c:pay:{s.account.id}:{s.period}",
+                text=f"{c.name} · corte {c.cut_day or '?'} · pago {c.due_day or '?'}",
+                callback_data=f"c:edit:{c.id}",
             )
         ]
-        for s in statements
-        if s.to_pay > 0
+        for c in cards
     ]
-    rows.append([InlineKeyboardButton(text="📅 Próximos meses", callback_data="c:future")])
+    rows.append([InlineKeyboardButton(text="Agregar tarjeta", callback_data="c:new")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
+
+
+def card_fields(card_id: int) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="Día de corte", callback_data=f"c:set:{card_id}:cut"),
+                InlineKeyboardButton(text="Día de pago", callback_data=f"c:set:{card_id}:due"),
+            ],
+            [
+                InlineKeyboardButton(text="Cupo", callback_data=f"c:set:{card_id}:limit"),
+                InlineKeyboardButton(text="Volver", callback_data="c:cards"),
+            ],
+        ]
+    )
 
 
 def fixed_list(pending) -> InlineKeyboardMarkup:

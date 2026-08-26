@@ -164,6 +164,10 @@ No hay importador automático todavía. Lo práctico:
 - [ ] Una foto de recibo de prueba se lee bien
 - [ ] Una nota de voz de prueba se entiende
 - [ ] `/tarjetas` muestra los cortes correctos (¡verifica contra su estado de cuenta real!)
+- [ ] `/corte` coincide con lo que el cliente espera: anota un gasto de prueba
+      con tarjeta y confirma con él que el mes que dice el bot es el correcto
+- [ ] El cliente sabe que puede corregir las fechas solo, desde
+      `/tarjetas → Editar fechas`
 - [ ] El panel abre en el celular del cliente y está guardado en favoritos
 - [ ] Los dos cron jobs corriendo
 - [ ] El cliente sabe que el enlace del panel **no se comparte**

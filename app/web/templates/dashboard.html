@@ -184,7 +184,7 @@
               <span class="a">{{ c.to_pay | money }}</span>
             </div>
             <div class="cc-meta">
-              <span>Corte {{ c.cut.strftime('%d/%m') }}</span>
+              <span>Compras del {{ c.window[0].strftime('%d/%m') }} al {{ c.window[1].strftime('%d/%m') }}</span>
               {% if c.overdue %}
                 <span class="crit">Venció el {{ c.due.strftime('%d/%m') }}</span>
               {% elif c.days_left == 0 %}
@@ -206,9 +206,35 @@
             {% if fut %}
             <div class="future">
               {% for period, amount in fut %}
-                <span>{{ period[5:] }}/{{ period[2:4] }} · {{ amount | money }}</span>
+                <span>{{ period | mes }} · {{ amount | money }}</span>
               {% endfor %}
             </div>
+            {% endif %}
+
+            {% if c.movements %}
+            <details class="data cut">
+              <summary>Ver los {{ c.movements | length }} movimientos del corte</summary>
+              <div class="scroll">
+                <table>
+                  <tbody>
+                    {% for m in c.movements %}
+                    <tr>
+                      <td>{{ m.date.strftime('%d/%m') }}</td>
+                      <td class="strong">{{ m.label[:28] }}
+                        {% if m.installment %}<span class="pill">cuota {{ m.installment }}</span>{% endif %}
+                      </td>
+                      <td class="num">{{ m.amount | money }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </details>
+            {% endif %}
+
+            {% if c.today_cut %}
+            <p class="cc-meta hoy"><span>Lo que compres hoy entra al corte del
+              {{ c.today_cut.strftime('%d/%m') }} y lo pagas el {{ c.today_due.strftime('%d/%m') }}.</span></p>
             {% endif %}
           </div>
           {% endfor %}
@@ -281,7 +307,9 @@
               {% if t.installments_total > 1 %}<span class="pill">{{ t.installments_total }} cuotas</span>{% endif %}
             </td>
             <td class="hide-sm">{{ t.category.name if t.category else '—' }}</td>
-            <td class="hide-sm">{{ t.account.name if t.account else '—' }}</td>
+            <td class="hide-sm">{{ t.account.name if t.account else '—' }}
+              {% if statement_of.get(t.id) %}<span class="pill">corte {{ statement_of[t.id] | mes }}</span>{% endif %}
+            </td>
             <td class="num">{{ t.amount | money }}</td>
             <td class="num">{% if t.my_share is not none %}{{ t.my_share | money }}{% else %}—{% endif %}</td>
           </tr>

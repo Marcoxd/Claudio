@@ -68,3 +68,48 @@ def test_que_corte_se_paga_este_mes():
     assert statement_due_in("2026-08", 20, 10) == "2026-07"
     # corte 5, pago 25 -> en agosto pago el corte de agosto
     assert statement_due_in("2026-08", 5, 25) == "2026-08"
+
+
+def test_ventana_del_corte():
+    from app.services.cards import statement_window
+
+    # corte el 20: el estado de agosto cubre del 21 de julio al 20 de agosto
+    assert statement_window("2026-08", 20) == (dt.date(2026, 7, 21), dt.date(2026, 8, 20))
+
+
+def test_ventana_del_corte_en_marzo_tras_febrero():
+    from app.services.cards import statement_window
+
+    start, end = statement_window("2026-03", 31)
+    assert start == dt.date(2026, 3, 1)   # febrero cerró el 28
+    assert end == dt.date(2026, 3, 31)
+
+
+def test_compra_de_hoy_dice_a_que_corte_va():
+    from app.money import ZERO
+    from app.services.cards import place_purchase
+
+    p = place_purchase(card(cut=20, due=10), dt.date(2026, 8, 26), ZERO, 1)
+    assert p.period == "2026-09"
+    assert p.cut_date == dt.date(2026, 9, 20)
+    assert p.due_date == dt.date(2026, 10, 10)
+    assert not p.is_deferred
+
+
+def test_diferido_dice_desde_y_hasta_que_corte():
+    from app.services.cards import place_purchase
+
+    p = place_purchase(card(cut=20, due=10), dt.date(2026, 8, 26), D("1200"), 12)
+    assert p.period == "2026-09"
+    assert p.last_period == "2027-08"
+    assert p.last_due_date == dt.date(2027, 9, 10)
+    assert p.installment_amount == D("100.00")
+    assert p.is_deferred
+
+
+def test_compra_con_debito_no_tiene_corte():
+    from app.models import ACCOUNT_DEBIT
+    from app.services.cards import place_purchase
+
+    debito = Account(id=2, name="Débito", type=ACCOUNT_DEBIT)
+    assert place_purchase(debito, dt.date(2026, 8, 26), D("10"), 1) is None
