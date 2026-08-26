@@ -163,16 +163,30 @@ Excel no estaba sumando.
 
 ```bash
 git clone <tu-repo> && cd kuri
+./scripts/arrancar.sh
+```
+
+Ese script crea el entorno, instala todo, revisa la configuración y arranca.
+La primera vez te crea el `.env` y te pide las dos claves.
+
+¿Prefieres a mano?
+
+```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+cp .env.example .env                      # llena las dos claves
 
-cp .env.example .env      # llena TELEGRAM_TOKEN y GEMINI_API_KEY
-python run_bot.py         # el bot por polling, sin webhook
+PYTHONPATH=. python scripts/verificar.py  # ¿está todo bien?
+python run_bot.py                         # el bot, por polling
 
 # en otra terminal, el panel:
 uvicorn app.main:app --reload
-# ábrelo en http://localhost:8000/?t=TU_DASHBOARD_TOKEN
+# http://localhost:8000/?t=TU_DASHBOARD_TOKEN
 ```
+
+`scripts/verificar.py` comprueba que el token de Telegram sea válido, que la
+clave de Gemini responda y que la base esté accesible. Cuando algo no arranque,
+empieza por ahí.
 
 ¿Quieres verlo con datos de ejemplo antes de configurar nada?
 
