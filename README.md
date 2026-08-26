@@ -53,6 +53,7 @@ Studio, tier gratuito).
 - Cuánto te queda para gastar este mes (lo más importante, arriba y grande).
 - Ingresos vs. gastos, en qué se te va la plata, tarjetas, deudas, colchón.
 - Modo claro y oscuro, funciona en el celular.
+- Sin pedir nada a servidores externos: ni fuentes, ni scripts, ni CDNs.
 
 **Extras**
 - `/pregunta ¿en qué se me fue la plata?` — responde con tus números reales.
@@ -194,6 +195,7 @@ tarjetas, diferidos, división de cuentas y el cálculo de disponible.
 - El panel está detrás de un token; cámbialo si lo compartiste por error.
 - A Gemini solo se le manda lo que le pides interpretar (el texto, el audio o la
   imagen del recibo), nunca tu historial.
+- El panel no carga nada de terceros, así que abrirlo no le avisa a nadie.
 - Google no entrena con los datos de la API de pago; en el **tier gratuito sí
   puede usarlos para mejorar sus modelos**. Si eso te incomoda, activa
   facturación en AI Studio o usa el parser por reglas.

@@ -59,7 +59,7 @@ async def test_start_y_ayuda(session):
 async def test_resumen_con_datos(poblado):
     m = FakeMessage()
     await reports_h.cmd_summary(m, poblado)
-    assert "Disponible para gastar" in m.sent[0]
+    assert "Te queda para gastar" in m.sent[0]
 
 
 async def test_resumen_sin_datos(session):

@@ -90,7 +90,7 @@ async def dashboard(
     biggest = top[0].amount if top else ZERO
     categories = [
         {
-            "label": c.label,
+            "label": c.name,
             "amount": c.amount,
             "pct": pct(c.amount, biggest or 1),
             "share": pct(c.amount, report.real_expenses or 1),

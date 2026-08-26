@@ -6,7 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>{{ app_name }} · {{ period_label }}</title>
 <link rel="stylesheet" href="/static/style.css">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💸</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='13' fill='%23c25a3e'/></svg>">
 </head>
 <body>
 <div class="wrap">
@@ -14,26 +14,26 @@
   <header class="top">
     <div class="brand">
       <h1>{{ app_name }}</h1>
-      <span>{% if owner %}{{ owner }} · {% endif %}{{ tagline }}</span>
+      <span>{% if owner %}{{ owner }}{% else %}{{ tagline }}{% endif %}</span>
     </div>
     <nav class="monthnav">
-      <a href="/?period={{ prev_period }}" title="Mes anterior">‹</a>
+      <a href="/?period={{ prev_period }}" title="Mes anterior">←</a>
       <span class="current">{{ period_label }}</span>
-      <a href="/?period={{ next_period }}" title="Mes siguiente">›</a>
+      <a href="/?period={{ next_period }}" title="Mes siguiente">→</a>
     </nav>
   </header>
 
   <!-- ------------------------------------------------------------ hero -->
   {% set available = r.available_to_spend %}
   <section class="hero">
-    <div class="eyebrow">Disponible para gastar</div>
+    <p class="eyebrow">Te queda para gastar</p>
     <div class="figure {% if available < 0 %}negative{% endif %}">{{ available | money }}</div>
     <p class="note">
       {% if available < 0 %}
-        Vas <b>{{ (0 - available) | money }}</b> por encima de tus ingresos de este mes.
+        Vas <b>{{ (0 - available) | money }}</b> por encima de lo que entra este mes.
       {% else %}
-        Después de fijos, tarjetas y lo que ya gastaste, de
-        <b>{{ r.income_total | money }}</b> de ingresos.
+        De <b>{{ r.income_total | money }}</b> que entran, después de fijos, tarjetas
+        y lo que ya gastaste.
       {% endif %}
     </p>
 
@@ -48,9 +48,9 @@
       <i class="var"   style="width: {{ '%.1f' % ([p_var, 100] | min) }}%"></i>
     </div>
     <div class="meterkey">
-      <span><i class="dot" style="background: var(--series-1)"></i>Fijos <b>{{ r.fixed_total | money }}</b></span>
-      <span><i class="dot" style="background: var(--series-2)"></i>Tarjetas <b>{{ r.cards_due | money }}</b></span>
-      <span><i class="dot" style="background: var(--series-3)"></i>Variables <b>{{ r.cash_variable | money }}</b></span>
+      <span><i class="dot" style="background: var(--clay)"></i>Fijos <b>{{ r.fixed_total | money }}</b></span>
+      <span><i class="dot" style="background: var(--blue)"></i>Tarjetas <b>{{ r.cards_due | money }}</b></span>
+      <span><i class="dot" style="background: var(--green)"></i>Variables <b>{{ r.cash_variable | money }}</b></span>
     </div>
   </section>
 
@@ -62,7 +62,7 @@
       <div class="s">{% if r.income_expected > 0 %}{{ r.income_expected | money }} por recibir{% else %}todo recibido{% endif %}</div>
     </div>
     <div class="card tile">
-      <div class="k">Gasto real del mes</div>
+      <div class="k">Gasto real</div>
       <div class="v">{{ r.real_expenses | money }}</div>
       <div class="s">sin la parte de otros</div>
     </div>
@@ -82,22 +82,22 @@
     <div>
       <!-- ------------------------------------------------------ flujo -->
       <section class="card">
-        <h2>Ingresos vs. gastos · 6 meses</h2>
+        <h2>Ingresos y gastos</h2>
         <div class="legend">
-          <span><i class="dot" style="background: var(--series-1)"></i><b>Ingresos</b></span>
-          <span><i class="dot" style="background: var(--series-2)"></i><b>Gastos</b></span>
+          <span><i class="dot" style="background: var(--blue)"></i>Ingresos</span>
+          <span><i class="dot" style="background: var(--clay)"></i>Gastos</span>
         </div>
         <div class="chart" id="chart">
           <svg viewBox="0 0 {{ chart.width }} {{ chart.height }}" role="img"
-               aria-label="Evolución de ingresos y gastos de los últimos seis meses">
+               aria-label="Evolución de ingresos y gastos de los últimos meses">
             {% for g in chart.grid %}
               <line class="gridline" x1="0" x2="{{ chart.width }}" y1="{{ g.y }}" y2="{{ g.y }}"></line>
             {% endfor %}
             <path class="line-income"  d="{{ chart.income_path }}"></path>
             <path class="line-expense" d="{{ chart.expense_path }}"></path>
             {% for p in chart.points %}
-              <circle class="marker income"  cx="{{ p.x }}" cy="{{ p.income_y }}"  r="4.5"></circle>
-              <circle class="marker expense" cx="{{ p.x }}" cy="{{ p.expense_y }}" r="4.5"></circle>
+              <circle class="marker income"  cx="{{ p.x }}" cy="{{ p.income_y }}"  r="4"></circle>
+              <circle class="marker expense" cx="{{ p.x }}" cy="{{ p.expense_y }}" r="4"></circle>
               <text class="axis-label" x="{{ p.x }}" y="{{ chart.height - 8 }}" text-anchor="middle">{{ p.label }}</text>
               <rect class="hitzone" x="{{ p.x - 28 }}" y="0" width="56" height="{{ chart.height - 20 }}"
                     data-period="{{ p.period }}" data-income="{{ p.income }}" data-expenses="{{ p.expenses }}"
@@ -105,10 +105,10 @@
             {% endfor %}
             {% if chart.points %}
               {% set last = chart.points[-1] %}
-              <text class="axis-label" x="{{ last.x - 6 }}" y="{{ last.income_y - 10 }}" text-anchor="end"
-                    fill="var(--text-primary)" font-weight="600">{{ last.income | money }}</text>
-              <text class="axis-label" x="{{ last.x - 6 }}" y="{{ last.expense_y + 18 }}" text-anchor="end"
-                    fill="var(--text-primary)" font-weight="600">{{ last.expenses | money }}</text>
+              <text class="axis-label" x="{{ last.x - 8 }}" y="{{ last.income_y - 11 }}" text-anchor="end"
+                    fill="var(--ink)">{{ last.income | money }}</text>
+              <text class="axis-label" x="{{ last.x - 8 }}" y="{{ last.expense_y + 18 }}" text-anchor="end"
+                    fill="var(--ink)">{{ last.expenses | money }}</text>
             {% endif %}
           </svg>
           <div class="tooltip" id="tip"></div>
@@ -135,53 +135,39 @@
 
       <!-- -------------------------------------------------- categorías -->
       <section class="card">
-        <h2>En qué se te va la plata</h2>
+        <h2>En qué se te va</h2>
         {% if categories %}
         <div class="bars">
           {% for c in categories %}
           <div class="bar-row">
             <div class="name" title="{{ c.label }}">{{ c.label }}</div>
-            <div class="bar-track"><div class="bar-fill" style="width: {{ '%.1f' % c.pct }}%"></div></div>
             <div class="val">{{ c.amount | money }}</div>
+            <div class="bar-track"><div class="bar-fill" style="width: {{ '%.1f' % c.pct }}%"></div></div>
           </div>
           {% endfor %}
         </div>
         {% else %}
-        <p class="empty">Aún no hay gastos registrados en {{ period_label }}.</p>
+        <p class="empty">Aún no hay gastos en {{ period_label | lower }}.</p>
         {% endif %}
       </section>
 
-      <!-- ------------------------------------------------ movimientos -->
+      <!-- -------------------------------------------------------- fijos -->
       <section class="card">
-        <h2>Últimos movimientos</h2>
-        {% if recent %}
-        <div class="scroll">
-          <table>
-            <thead>
-              <tr>
-                <th>Fecha</th><th>Detalle</th><th>Categoría</th><th>Pago</th>
-                <th class="num">Total</th><th class="num">Mi parte</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for t in recent %}
-              <tr>
-                <td>{{ t.date.strftime('%d/%m') }}</td>
-                <td class="strong">
-                  {% if t.kind == 'income' %}↑ {% endif %}{{ t.description[:44] }}
-                  {% if t.installments_total > 1 %}<span class="badge">{{ t.installments_total }} cuotas</span>{% endif %}
-                </td>
-                <td>{{ t.category.name if t.category else '—' }}</td>
-                <td>{{ t.account.name if t.account else '—' }}</td>
-                <td class="num">{{ t.amount | money }}</td>
-                <td class="num">{% if t.my_share is not none %}{{ t.my_share | money }}{% else %}—{% endif %}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+        <h2>Fijos de {{ period_label | lower }}</h2>
+        {% set fixed_txs = r.transactions | selectattr('fixed_expense_id') | list %}
+        {% if fixed_txs %}
+        <div class="list">
+          {% for t in fixed_txs %}
+          <div class="item {% if t.status != 'planned' %}done{% endif %}">
+            <span class="l">{{ t.description[:26] }}
+              <span class="when">· {% if t.status == 'planned' %}día {{ t.date.day }}{% else %}pagado{% endif %}</span>
+            </span>
+            <span class="r">{{ t.amount | money }}</span>
+          </div>
+          {% endfor %}
         </div>
         {% else %}
-        <p class="empty">Nada registrado todavía. Escríbele al bot para empezar.</p>
+        <p class="empty">Sin gastos fijos configurados.</p>
         {% endif %}
       </section>
     </div>
@@ -189,7 +175,7 @@
     <aside>
       <!-- ----------------------------------------------------- tarjetas -->
       <section class="card">
-        <h2>Tarjetas de crédito</h2>
+        <h2>Tarjetas</h2>
         {% if cards %}
           {% for c in cards %}
           <div class="cc">
@@ -200,13 +186,15 @@
             <div class="cc-meta">
               <span>Corte {{ c.cut.strftime('%d/%m') }}</span>
               {% if c.overdue %}
-                <span class="badge critical">⚠ Venció {{ c.due.strftime('%d/%m') }}</span>
+                <span class="crit">Venció el {{ c.due.strftime('%d/%m') }}</span>
+              {% elif c.days_left == 0 %}
+                <span class="warn">Vence hoy</span>
               {% elif c.days_left <= 5 %}
-                <span class="badge warning">⏰ Vence en {{ c.days_left }} d</span>
+                <span class="warn">Vence en {{ c.days_left }} días</span>
               {% else %}
-                <span class="badge good">✓ Vence {{ c.due.strftime('%d/%m') }}</span>
+                <span>Vence {{ c.due.strftime('%d/%m') }}</span>
               {% endif %}
-              {% if c.others > 0 %}<span>🤝 {{ c.others | money }} de otros</span>{% endif %}
+              {% if c.others > 0 %}<span>{{ c.others | money }} es de otros</span>{% endif %}
             </div>
             {% if c.used_pct is not none %}
               <div class="cupo" role="img" aria-label="Cupo usado {{ '%.0f' % (c.used_pct) }} por ciento">
@@ -233,17 +221,17 @@
       {% if buffer.total > 0 %}
       <section class="card">
         <h2>{{ buffer.name }} · no es tuyo</h2>
-        <div class="tile">
+        <div class="tile" style="padding: 0">
           <div class="v">{{ buffer.available | money }}</div>
           <div class="s">disponible de {{ buffer.total | money }}</div>
         </div>
-        <div class="cupo" style="margin-top:12px" role="img"
+        <div class="cupo" style="margin-top: 16px" role="img"
              aria-label="Usado {{ '%.0f' % (buffer.pct_used) }} por ciento del colchón">
           <i style="width: {{ '%.1f' % ([buffer.pct_used, 100] | min) }}%"></i>
         </div>
         {% if buffer.debt > 0 %}
-        <p class="note" style="margin-top:10px; font-size:13.5px; color: var(--text-secondary)">
-          Debes reponer <b style="color: var(--critical)">{{ buffer.debt | money }}</b>.
+        <p class="cc-meta" style="margin-top: 12px">
+          <span class="crit">Debes reponer {{ buffer.debt | money }}</span>
         </p>
         {% endif %}
       </section>
@@ -256,40 +244,57 @@
         <div class="list">
           {% for b in debts %}
           <div class="item">
-            <span class="l">{{ b.person.name }} · {{ b.shares | length }} gasto{{ '' if b.shares | length == 1 else 's' }}</span>
+            <span class="l">{{ b.person.name }}
+              <span class="when">· {{ b.shares | length }} gasto{{ '' if b.shares | length == 1 else 's' }}</span>
+            </span>
             <span class="r">{{ b.owes_me | money }}</span>
           </div>
           {% endfor %}
         </div>
         {% else %}
-        <p class="empty">Nadie te debe nada. 🎉</p>
+        <p class="empty">Nadie te debe nada.</p>
         {% endif %}
       </section>
 
-      <!-- -------------------------------------------------------- fijos -->
-      <section class="card">
-        <h2>Fijos de {{ period_label }}</h2>
-        {% set fixed_txs = r.transactions | selectattr('fixed_expense_id') | list %}
-        {% if fixed_txs %}
-        <div class="list">
-          {% for t in fixed_txs %}
-          <div class="item">
-            <span class="l">
-              {% if t.status == 'planned' %}🕒{% else %}✅{% endif %}
-              {{ t.description[:26] }} · día {{ t.date.day }}
-            </span>
-            <span class="r">{{ t.amount | money }}</span>
-          </div>
-          {% endfor %}
-        </div>
-        {% else %}
-        <p class="empty">Sin gastos fijos configurados.</p>
-        {% endif %}
-      </section>
     </aside>
   </div>
 
-  <p class="foot">{{ app_name }} · datos al {{ period_label }} · <a href="/salir">cerrar sesión</a></p>
+  <!-- --------------------------------------------------- movimientos -->
+  <section class="card">
+    <h2>Últimos movimientos</h2>
+    {% if recent %}
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th><th>Detalle</th><th class="hide-sm">Categoría</th><th class="hide-sm">Pago</th>
+            <th class="num">Total</th><th class="num">Mi parte</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for t in recent %}
+          <tr>
+            <td>{{ t.date.strftime('%d/%m') }}</td>
+            <td class="strong">
+              {{ t.description[:44] }}
+              {% if t.kind == 'income' %}<span class="pill">ingreso</span>{% endif %}
+              {% if t.installments_total > 1 %}<span class="pill">{{ t.installments_total }} cuotas</span>{% endif %}
+            </td>
+            <td class="hide-sm">{{ t.category.name if t.category else '—' }}</td>
+            <td class="hide-sm">{{ t.account.name if t.account else '—' }}</td>
+            <td class="num">{{ t.amount | money }}</td>
+            <td class="num">{% if t.my_share is not none %}{{ t.my_share | money }}{% else %}—{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="empty">Nada registrado todavía. Escríbele al bot para empezar.</p>
+    {% endif %}
+  </section>
+
+  <p class="foot">{{ app_name }} · <a href="/salir">cerrar sesión</a></p>
 </div>
 
 <script>
@@ -303,7 +308,7 @@
   };
 
   chart.querySelectorAll('.hitzone').forEach(function (zone) {
-    function show(event) {
+    function show() {
       var box = svg.getBoundingClientRect();
       var scale = box.width / svg.viewBox.baseVal.width;
       var x = parseFloat(zone.dataset.x) * scale;
@@ -314,9 +319,8 @@
         '<div class="row"><span>Balance</span><b>' + fmt(zone.dataset.net) + '</b></div>';
       tip.classList.add('on');
       var width = tip.offsetWidth;
-      var left = Math.min(Math.max(x - width / 2, 0), box.width - width);
-      tip.style.left = left + 'px';
-      tip.style.top = '6px';
+      tip.style.left = Math.min(Math.max(x - width / 2, 0), box.width - width) + 'px';
+      tip.style.top = '0px';
     }
     zone.addEventListener('mouseenter', show);
     zone.addEventListener('focus', show);

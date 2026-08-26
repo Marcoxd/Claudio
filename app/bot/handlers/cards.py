@@ -28,12 +28,12 @@ async def _cards_text(session: AsyncSession) -> tuple[str, list]:
     cards = await credit_cards(session)
     if not cards:
         return (
-            "💳 Todavía no tienes tarjetas registradas.\n"
-            "Usa /setup para agregarlas (nombre, día de corte y día de pago).",
+            "Todavía no tienes tarjetas registradas.\n"
+            "Agrégalas con /setup: nombre, día de corte y día de pago.",
             [],
         )
     period = current_period()
-    lines = [f"💳 <b>Tarjetas</b> · {period_label(period)}", ""]
+    lines = [f"<b>Tarjetas</b> · {period_label(period)}", ""]
     statements = []
     grand_total = ZERO
     for card in cards:
@@ -42,22 +42,29 @@ async def _cards_text(session: AsyncSession) -> tuple[str, list]:
         statements.append(summary)
         grand_total = D(grand_total + summary.to_pay)
 
-        flag = "⚠️" if summary.is_overdue else ("🔔" if 0 <= summary.days_left <= 5 else "•")
-        lines.append(f"{flag} <b>{card.name}</b>")
-        lines.append(f"   A pagar: <b>{money(summary.to_pay)}</b>")
-        lines.append(
-            f"   Corte {date_es(summary.cut_date)} · vence {date_es(summary.due_date)}"
-            + (f" (en {summary.days_left} días)" if summary.days_left >= 0 else " ¡vencida!")
-        )
+        if summary.is_overdue:
+            when = f"venció el {date_es(summary.due_date)}"
+        elif summary.days_left == 0:
+            when = "vence hoy"
+        elif summary.days_left <= 5:
+            when = f"vence en {summary.days_left} días"
+        else:
+            when = f"vence {date_es(summary.due_date)}"
+
+        lines.append(f"<b>{card.name}</b> · {money(summary.to_pay)}")
+        lines.append(f"Corte {date_es(summary.cut_date)} · {when}")
         if summary.others_share > 0:
-            lines.append(f"   🤝 De eso, {money(summary.others_share)} es de otros")
+            lines.append(f"De eso, {money(summary.others_share)} es de otros.")
         deferred = [i for i in summary.installments if i.count > 1]
         if deferred:
-            lines.append(f"   🧾 {len(deferred)} cuotas de diferidos este corte")
+            plural = "cuota" if len(deferred) == 1 else "cuotas"
+            lines.append(f"{len(deferred)} {plural} de diferidos en este corte.")
         if card.credit_limit:
             used = await card_balance(session, card)
-            free = D(D(card.credit_limit) - used)
-            lines.append(f"   💠 Cupo disponible: {money(free)} de {money(card.credit_limit)}")
+            lines.append(
+                f"Cupo libre {money(D(D(card.credit_limit) - used))} "
+                f"de {money(card.credit_limit)}."
+            )
         lines.append("")
 
     lines.append(f"<b>Total a pagar este mes: {money(grand_total)}</b>")
@@ -65,7 +72,7 @@ async def _cards_text(session: AsyncSession) -> tuple[str, list]:
 
 
 @router.message(Command("tarjetas"))
-@router.message(F.text == "💳 Tarjetas")
+@router.message(F.text == "Tarjetas")
 async def cmd_cards(message: Message, session: AsyncSession) -> None:
     text, statements = await _cards_text(session)
     await message.answer(text, reply_markup=card_actions(statements) if statements else None)
@@ -74,7 +81,7 @@ async def cmd_cards(message: Message, session: AsyncSession) -> None:
 @router.callback_query(F.data == "c:future")
 async def cb_future(callback: CallbackQuery, session: AsyncSession) -> None:
     period = current_period()
-    lines = ["📅 <b>Cuotas ya comprometidas</b>", ""]
+    lines = ["<b>Cuotas ya comprometidas</b>", ""]
     for card in await credit_cards(session):
         rows = await future_commitments(session, card, period, months=6)
         rows = [(p, a) for p, a in rows if a > 0]
@@ -112,7 +119,7 @@ async def cb_pay(callback: CallbackQuery, session: AsyncSession) -> None:
     )
     await session.flush()
     await callback.message.answer(
-        f"✅ Registrado el pago de <b>{money(summary.to_pay)}</b> a {card.name} "
+        f"Registrado el pago de <b>{money(summary.to_pay)}</b> a {card.name} "
         f"(corte {period_label(period)})."
     )
     await callback.answer("Pago registrado")
@@ -149,6 +156,6 @@ async def cmd_pay(message: Message, session: AsyncSession) -> None:
     await session.flush()
     summary = await statement(session, card, period)
     await message.answer(
-        f"✅ Abono de {money(amount)} a <b>{card.name}</b>.\n"
+        f"Abono de {money(amount)} a <b>{card.name}</b>.\n"
         f"Queda pendiente <b>{money(summary.to_pay)}</b> del corte {period_label(period)}."
     )

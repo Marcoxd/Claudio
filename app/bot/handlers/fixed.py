@@ -27,7 +27,7 @@ class NewFixed(StatesGroup):
 
 
 @router.message(Command("fijos"))
-@router.message(F.text == "🏠 Fijos")
+@router.message(F.text == "Fijos")
 async def cmd_fixed(message: Message, session: AsyncSession) -> None:
     period = current_period()
     pending = await pending_this_month(session, period)
@@ -39,13 +39,13 @@ async def cmd_fixed(message: Message, session: AsyncSession) -> None:
 
     if not defined:
         await message.answer(
-            "🏠 Aún no tienes gastos fijos.\n\n"
-            "Agrégalos con /nuevofijo (arriendo, internet, teléfono, préstamo, carro…) "
-            "y cada mes te los recuerdo y los descuento de tu disponible.",
+            "Aún no tienes gastos fijos.\n\n"
+            "Agrégalos con /nuevofijo — arriendo, internet, teléfono, préstamo, "
+            "carro… Cada mes te los recuerdo y los descuento de tu disponible.",
         )
         return
 
-    lines = [f"🏠 <b>Gastos fijos</b> · {period_label(period)}", ""]
+    lines = [f"<b>Gastos fijos</b> · {period_label(period)}", ""]
     paid = [
         t
         for t in (
@@ -59,10 +59,12 @@ async def cmd_fixed(message: Message, session: AsyncSession) -> None:
         ).scalars().all()
     ]
     for tx in pending:
-        mark = "⚠️" if tx.date < today() else "🕒"
-        lines.append(f"{mark} {tx.description} — <b>{money(tx.amount)}</b> · vence {date_es(tx.date)}")
+        estado = "vencido el" if tx.date < today() else "vence el"
+        lines.append(
+            f"<b>{tx.description}</b> · {money(tx.amount)} · {estado} {date_es(tx.date)}"
+        )
     for tx in paid:
-        lines.append(f"✅ {tx.description} — {money(tx.amount)}")
+        lines.append(f"<i>{tx.description} · {money(tx.amount)} · pagado</i>")
 
     lines.append("")
     lines.append(f"Pendiente: <b>{money(total(t.amount for t in pending))}</b>")
@@ -70,11 +72,11 @@ async def cmd_fixed(message: Message, session: AsyncSession) -> None:
 
     loans = [f for f in defined if f.lender_person_id or f.installments_total]
     if loans:
-        lines.append("\n🏦 <b>Préstamos</b>")
+        lines += ["", "<b>Préstamos</b>"]
         for loan in loans:
             who = loan.lender.name if loan.lender else "—"
             extra = f" · {loan.installments_total} cuotas" if loan.installments_total else ""
-            lines.append(f"   • {loan.name} ({who}) {money(loan.amount)}/mes{extra}")
+            lines.append(f"{loan.name} · {who} · {money(loan.amount)} al mes{extra}")
 
     await message.answer("\n".join(lines), reply_markup=fixed_list(pending))
 
@@ -86,7 +88,7 @@ async def cb_mark_paid(callback: CallbackQuery, session: AsyncSession) -> None:
         await callback.answer("No encontrado", show_alert=True)
         return
     await mark_paid(session, tx, date=today())
-    await callback.message.answer(f"✅ {tx.description} marcado como pagado ({money(tx.amount)}).")
+    await callback.message.answer(f"{tx.description} marcado como pagado · {money(tx.amount)}")
     await callback.answer("Pagado")
 
 
@@ -96,21 +98,21 @@ async def cb_mark_paid(callback: CallbackQuery, session: AsyncSession) -> None:
 @router.callback_query(F.data == "f:new")
 async def cb_new_fixed(callback: CallbackQuery, state: FSMContext) -> None:
     await state.set_state(NewFixed.name)
-    await callback.message.answer("🏠 ¿Cómo se llama el gasto fijo? <i>(ej: Arriendo)</i>")
+    await callback.message.answer("¿Cómo se llama el gasto fijo? <i>(ej: Arriendo)</i>")
     await callback.answer()
 
 
 @router.message(Command("nuevofijo"))
 async def cmd_new_fixed(message: Message, state: FSMContext) -> None:
     await state.set_state(NewFixed.name)
-    await message.answer("🏠 ¿Cómo se llama el gasto fijo? <i>(ej: Arriendo)</i>")
+    await message.answer("¿Cómo se llama el gasto fijo? <i>(ej: Arriendo)</i>")
 
 
 @router.message(NewFixed.name)
 async def step_name(message: Message, state: FSMContext) -> None:
     await state.update_data(name=message.text.strip()[:96])
     await state.set_state(NewFixed.amount)
-    await message.answer("💵 ¿Cuánto es al mes?")
+    await message.answer("¿Cuánto es al mes?")
 
 
 @router.message(NewFixed.amount)
@@ -122,7 +124,7 @@ async def step_amount(message: Message, state: FSMContext) -> None:
         return
     await state.update_data(amount=float(amount))
     await state.set_state(NewFixed.day)
-    await message.answer("📅 ¿Qué día del mes se paga? <i>(1 a 31)</i>")
+    await message.answer("¿Qué día del mes se paga? <i>(1 a 31)</i>")
 
 
 @router.message(NewFixed.day)
@@ -139,7 +141,7 @@ async def step_day(message: Message, state: FSMContext, session: AsyncSession) -
     ).scalars().all()
     await state.set_state(NewFixed.category)
     await message.answer(
-        "🏷️ ¿En qué categoría lo pongo?",
+        "¿En qué categoría lo pongo?",
         reply_markup=pick_list("f:cat", 0, [(c.id, c.label()) for c in cats], back=False),
     )
 
@@ -159,7 +161,7 @@ async def step_category(callback: CallbackQuery, state: FSMContext, session: Asy
     await session.flush()
     await state.clear()
     await callback.message.edit_text(
-        f"✅ Gasto fijo creado:\n<b>{fixed.name}</b> — {money(fixed.amount)} "
-        f"cada día {fixed.due_day}.\n\nLo verás en /fijos y en tu disponible mensual."
+        f"Listo: <b>{fixed.name}</b>, {money(fixed.amount)} cada día "
+        f"{fixed.due_day}.\n\nLo verás en /fijos y descontado de tu disponible."
     )
     await callback.answer("Creado")

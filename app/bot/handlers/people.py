@@ -16,26 +16,26 @@ router = Router(name="people")
 
 
 @router.message(Command("deudas"))
-@router.message(F.text == "🤝 Deudas")
+@router.message(F.text == "Deudas")
 async def cmd_debts(message: Message, session: AsyncSession) -> None:
     rows = await balances(session)
     if not rows:
         await message.answer(
-            "🤝 Nadie te debe nada ahora mismo.\n\n"
-            "Cuando anotes un gasto compartido (<i>«cena 96 con Ana y Luis»</i> o "
-            "dividiendo un recibo por ítems) aparecerá aquí."
+            "Nadie te debe nada ahora mismo.\n\n"
+            "Cuando anotes un gasto compartido —<i>«cena 96 con Ana y Luis»</i>, o "
+            "dividiendo un recibo por ítems— aparecerá aquí."
         )
         return
 
-    lines = ["🤝 <b>Te deben</b>", ""]
+    lines = ["<b>Te deben</b>", ""]
     for b in rows:
-        lines.append(f"👤 <b>{b.person.name}</b> — {money(b.owes_me)}")
+        lines.append(f"<b>{b.person.name}</b> · {money(b.owes_me)}")
         for share in b.shares[:5]:
             tx = share.split.transaction if share.split else None
             if tx:
-                lines.append(f"    • {date_es(tx.date)} {tx.description[:28]} — {money(share.amount)}")
+                lines.append(f"   {date_es(tx.date)} · {tx.description[:28]} · {money(share.amount)}")
         if len(b.shares) > 5:
-            lines.append(f"    … y {len(b.shares) - 5} gastos más")
+            lines.append(f"   y {len(b.shares) - 5} gastos más")
         lines.append("")
     lines.append(f"<b>Total por cobrar: {money(total(b.owes_me for b in rows))}</b>")
     await message.answer("\n".join(lines), reply_markup=debts_actions(rows))
@@ -47,7 +47,7 @@ async def cb_settle(callback: CallbackQuery, session: AsyncSession) -> None:
     person = await session.get(Person, person_id)
     settled = await settle_person(session, person_id, note="Saldado desde el bot")
     await callback.message.answer(
-        f"✅ {person.name if person else 'Persona'} saldó <b>{money(settled)}</b>. Cuentas claras."
+        f"{person.name if person else 'Listo'} saldó <b>{money(settled)}</b>. Cuentas claras."
     )
     await callback.answer("Saldado")
 
@@ -73,6 +73,6 @@ async def cmd_partial(message: Message, session: AsyncSession) -> None:
     settled = await settle_person(session, match.person.id, amount, note="Abono parcial")
     remaining = D(match.owes_me - settled)
     await message.answer(
-        f"✅ {match.person.name} abonó {money(settled)}.\n"
-        + (f"Aún debe <b>{money(remaining)}</b>." if remaining > 0 else "Quedó al día 🎉")
+        f"{match.person.name} abonó {money(settled)}.\n"
+        + (f"Aún debe <b>{money(remaining)}</b>." if remaining > 0 else "Quedó al día.")
     )

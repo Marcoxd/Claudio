@@ -18,12 +18,12 @@ def _rows(buttons: list[InlineKeyboardButton], per_row: int = 2) -> list[list[In
 def main_menu() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text="📊 Resumen"), KeyboardButton(text="💳 Tarjetas")],
-            [KeyboardButton(text="🏠 Fijos"), KeyboardButton(text="🤝 Deudas")],
-            [KeyboardButton(text="🛏️ Colchón"), KeyboardButton(text="📈 Panel")],
+            [KeyboardButton(text="Resumen"), KeyboardButton(text="Tarjetas")],
+            [KeyboardButton(text="Fijos"), KeyboardButton(text="Deudas")],
+            [KeyboardButton(text="Colchón"), KeyboardButton(text="Panel")],
         ],
         resize_keyboard=True,
-        input_field_placeholder="Escribe un gasto, manda una foto o una nota de voz…",
+        input_field_placeholder="Un gasto, una foto del recibo o una nota de voz…",
     )
 
 

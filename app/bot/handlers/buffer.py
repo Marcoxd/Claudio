@@ -9,42 +9,45 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import settings
 from app.money import D
 from app.services import buffer as buffer_service
-from app.services.format import bar, date_es, money
+from app.services.format import block, date_es, money, row
 
 router = Router(name="buffer")
 
 
 @router.message(Command("colchon", "colchón"))
-@router.message(F.text == "🛏️ Colchón")
+@router.message(F.text == "Colchón")
 async def cmd_buffer(message: Message, session: AsyncSession) -> None:
     state = await buffer_service.state(session)
     if state.total <= 0:
         await message.answer(
-            f"🛏️ <b>{settings.buffer_name}</b>\n\n"
-            "Todavía no has definido cuánto dinero ajeno tienes de colchón.\n"
-            "Usa <code>/colchontotal 500</code> para fijarlo.\n\n"
-            "Después basta con que escribas <i>«saqué 80 del colchón»</i> o "
+            f"<b>{settings.buffer_name}</b>\n\n"
+            "Todavía no defines cuánto dinero ajeno tienes de colchón.\n"
+            "Fíjalo con <code>/colchontotal 500</code>.\n\n"
+            "Después basta con escribir <i>«saqué 80 del colchón»</i> o "
             "<i>«repuse 80 al colchón»</i>."
         )
         return
 
-    icon = "🟢" if state.debt == 0 else ("🟡" if state.pct_used < 50 else "🔴")
     lines = [
-        f"🛏️ <b>{state.name}</b> <i>(no es tuyo)</i>",
+        f"<b>{state.name}</b>",
+        "<i>Este dinero no es tuyo.</i>",
         "",
-        f"Total asignado   <code>{money(state.total)}</code>",
-        f"Disponible       <code>{money(state.available)}</code>",
-        f"Debes reponer    <code>{money(state.debt)}</code>  {icon}",
-        "",
-        f"<code>{bar(state.pct_used)}</code> {state.pct_used:.0f}% usado",
+        block(
+            [
+                row("Total asignado", money(state.total)),
+                row("Disponible", money(state.available)),
+                row("Por reponer", money(state.debt)),
+            ]
+        ),
     ]
 
     history = await buffer_service.history(session, limit=8)
     if history:
-        lines.append("\n📜 <b>Últimos movimientos</b>")
+        lines += ["", "<b>Últimos movimientos</b>"]
         for mv in history:
-            sign = "➖" if mv.direction == "use" else "➕"
-            lines.append(f"{sign} {date_es(mv.date)} {money(mv.amount)} · {mv.note or ''}".rstrip())
+            verb = "sacaste" if mv.direction == "use" else "repusiste"
+            note = f" · {mv.note}" if mv.note else ""
+            lines.append(f"{date_es(mv.date)} · {verb} {money(mv.amount)}{note}")
 
     await message.answer("\n".join(lines))
 
@@ -62,7 +65,7 @@ async def cmd_set_total(message: Message, session: AsyncSession) -> None:
         return
     await buffer_service.set_total(session, amount)
     await message.answer(
-        f"🛏️ {settings.buffer_name} fijado en <b>{money(amount)}</b>.\n"
+        f"{settings.buffer_name} fijado en <b>{money(amount)}</b>.\n"
         "Ese dinero no cuenta como tuyo en el resumen."
     )
 
@@ -81,5 +84,5 @@ async def cmd_repay(message: Message, session: AsyncSession) -> None:
     await buffer_service.repay(session, amount, note="Reposición manual")
     state = await buffer_service.state(session)
     await message.answer(
-        f"➕ Repuesto {money(amount)}.\nTe falta reponer <b>{money(state.debt)}</b>."
+        f"Repuesto {money(amount)}. Te falta reponer <b>{money(state.debt)}</b>."
     )

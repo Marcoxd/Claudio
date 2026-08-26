@@ -20,12 +20,12 @@ router = Router(name="reports")
 
 
 @router.message(Command("resumen"))
-@router.message(F.text == "📊 Resumen")
+@router.message(F.text == "Resumen")
 async def cmd_summary(message: Message, session: AsyncSession) -> None:
     report = await month_report(session, current_period())
     await message.answer(
         month_report_text(report, settings.owner_name)
-        + f"\n\n📈 <a href=\"{dashboard_url()}\">Ver el panel completo</a>",
+        + f"\n\n<a href=\"{dashboard_url()}\">Ver el panel completo</a>",
         disable_web_page_preview=True,
     )
 

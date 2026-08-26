@@ -55,9 +55,9 @@ async def cb_save(callback: CallbackQuery, session: AsyncSession) -> None:
     tx = await commit_draft(session, payload)
     await delete_draft(session, draft)
 
-    lines = [f"✅ Guardado · <code>{money(tx.amount)}</code> · {tx.description}"]
+    lines = [f"Guardado · <b>{money(tx.amount)}</b> · {tx.description}"]
     if tx.split and tx.my_share is not None:
-        lines.append(f"👤 Te toca <b>{money(tx.my_share)}</b>")
+        lines.append(f"Te toca <b>{money(tx.my_share)}</b>")
         ids = [s.person_id for s in tx.split.shares if s.person_id is not None]
         names = {
             p.id: p.name
@@ -68,18 +68,18 @@ async def cb_save(callback: CallbackQuery, session: AsyncSession) -> None:
         for share in tx.split.shares:
             if share.person_id is not None:
                 lines.append(
-                    f"   • {names.get(share.person_id, 'Alguien')} debe {money(share.amount)}"
+                    f"   {names.get(share.person_id, 'Alguien')} debe {money(share.amount)}"
                 )
     if tx.installments:
         first = tx.installments[0]
         if first.count > 1:
             lines.append(
-                f"💳 {first.count} cuotas de {money(first.amount)} "
+                f"{first.count} cuotas de {money(first.amount)}, "
                 f"desde el corte {first.statement_period}"
             )
         else:
-            lines.append(f"💳 Entra al corte {first.statement_period} "
-                         f"(vence {first.due_date.strftime('%d/%m')})")
+            lines.append(f"Entra al corte {first.statement_period}, "
+                         f"vence el {first.due_date.strftime('%d/%m')}")
     await callback.message.edit_text("\n".join(lines))
     await callback.answer("Guardado")
 
@@ -90,7 +90,7 @@ async def cb_delete(callback: CallbackQuery, session: AsyncSession) -> None:
     if draft is None:
         return
     await delete_draft(session, draft)
-    await callback.message.edit_text("🗑 Descartado.")
+    await callback.message.edit_text("Descartado.")
     await callback.answer()
 
 
@@ -195,11 +195,13 @@ async def cb_show_items(callback: CallbackQuery, session: AsyncSession) -> None:
     draft, payload = await _get(callback, session)
     if draft is None:
         return
-    lines = ["🧺 <b>Ítems del recibo</b>", ""]
+    lines = ["<b>Ítems del recibo</b>", ""]
     for item in payload.get("items") or []:
-        tag = {"tax": "🧾", "tip": "🫱", "discount": "🔻"}.get(item["kind"], "•")
         qty = f"{item['quantity']:g}× " if float(item.get("quantity") or 1) != 1 else ""
-        lines.append(f"{tag} {qty}{item['name']} — {money(item['total'])}")
+        etiqueta = {"tax": " (impuesto)", "tip": " (servicio)", "discount": " (descuento)"}
+        lines.append(
+            f"{qty}{item['name']}{etiqueta.get(item['kind'], '')} · {money(item['total'])}"
+        )
     lines.append(f"\n<b>Total: {money(payload['amount'])}</b>")
     await callback.message.answer("\n".join(lines))
     await callback.answer()
@@ -240,7 +242,7 @@ async def cb_split_equal(callback: CallbackQuery, session: AsyncSession) -> None
         draft.state = f"{AWAIT_PERSON}:equal"
         await session.flush()
         await callback.message.edit_text(
-            "👥 ¿Con quién dividiste? Mándame los nombres separados por coma.\n"
+            "¿Con quién dividiste? Mándame los nombres separados por coma.\n"
             "<i>Ej: Ana, Luis</i>"
         )
         await callback.answer()
@@ -284,7 +286,7 @@ async def cb_new_person(callback: CallbackQuery, session: AsyncSession) -> None:
     draft.state = f"{AWAIT_PERSON}:{mode}"
     await session.flush()
     await callback.message.answer(
-        "✍️ Mándame el nombre (o varios separados por coma) de quienes se suman."
+        "Mándame el nombre —o varios separados por coma— de quienes se suman."
     )
     await callback.answer()
 
@@ -332,7 +334,7 @@ async def _start_item_assignment(callback, session, draft, payload) -> None:
         draft.state = f"{AWAIT_PERSON}:items"
         await session.flush()
         await callback.message.edit_text(
-            "👥 Primero dime con quiénes estabas (nombres separados por coma)."
+            "Primero dime con quiénes estabas: nombres separados por coma."
         )
         await callback.answer()
         return
@@ -355,11 +357,11 @@ async def _show_item(message, session, draft, payload, index: int, edit: bool = 
     names = {str(pid): name for pid, name in people}
     who = ", ".join("Yo" if a == "me" else names.get(str(a), "?") for a in assigned) or "nadie aún"
     text = (
-        f"🧺 <b>Ítem {index + 1} de {len(items)}</b>\n\n"
-        f"<b>{item['name']}</b>\n"
-        f"{money(item['total'])}\n\n"
-        f"👤 Asignado a: <i>{who}</i>\n\n"
-        f"<i>Los impuestos y la propina se reparten solos según lo que consumió cada quien.</i>"
+        f"<b>Ítem {index + 1} de {len(items)}</b>\n\n"
+        f"<b>{item['name']}</b> · {money(item['total'])}\n\n"
+        f"Va para: <i>{who}</i>\n\n"
+        f"<i>Los impuestos y la propina se reparten solos según lo que "
+        f"consumió cada quien.</i>"
     )
     parsed_assigned = [None if a == "me" else int(a) for a in assigned]
     markup = item_assign(draft.id, items, index, people, parsed_assigned)
@@ -440,13 +442,13 @@ def _preview_items_split(payload: dict, people: list[tuple[int, str]]) -> str:
         return ""
     base = total(subtotals.values())
     extra = D(D(payload["amount"]) - base)
-    lines = ["🧮 <b>División por ítems</b>"]
+    lines = ["<b>División por ítems</b>"]
     for key, value in subtotals.items():
         share = D(value + (extra * value / base if base else D(0)))
         who = "Yo" if key == "me" else names.get(key, "?")
-        lines.append(f"  • {who}: <b>{money(share)}</b>")
+        lines.append(f"   {who}: <b>{money(share)}</b>")
     if extra:
-        lines.append(f"  <i>(impuestos y propina prorrateados: {money(extra)})</i>")
+        lines.append(f"   <i>impuestos y propina prorrateados: {money(extra)}</i>")
     return "\n".join(lines)
 
 
