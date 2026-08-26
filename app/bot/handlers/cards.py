@@ -46,7 +46,9 @@ async def _cards_text(session: AsyncSession) -> tuple[str, list]:
         statements.append(summary)
         grand_total = D(grand_total + summary.to_pay)
 
-        if summary.is_overdue:
+        if summary.to_pay <= 0:
+            when = "sin saldo por pagar"
+        elif summary.is_overdue:
             when = f"venció el {date_es(summary.due_date)}"
         elif summary.days_left == 0:
             when = "vence hoy"
@@ -435,13 +437,14 @@ async def cmd_deferred(message: Message, session: AsyncSession) -> None:
     detalle = []
     for c in compras:
         nombre = c.transaction.description[:22]
-        faltan = "1 cuota" if c.remaining == 1 else f"{c.remaining} cuotas"
+        faltan = ("falta 1 cuota" if c.remaining == 1
+                  else f"faltan {c.remaining} cuotas")
         lines.append(f"<b>{nombre}</b> · {c.account.name}")
         lines.append(
             f"{money(c.total)} a {c.count} meses · {money(c.installment)} al mes"
         )
         lines.append(
-            f"Pagadas {c.paid} de {c.count} · faltan {faltan}: "
+            f"Pagadas {c.paid} de {c.count} · {faltan}: "
             f"<b>{money(c.remaining_amount)}</b>"
         )
         lines.append("")

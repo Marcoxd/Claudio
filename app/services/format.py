@@ -148,6 +148,11 @@ def month_report_text(report, name: str = "") -> str:
     ]
     if report.fixed_pending > 0:
         lines.append(f"<i>Te faltan {money(report.fixed_pending)} de fijos por pagar.</i>")
+    if report.card_charged != report.cards_due:
+        lines.append(
+            f"<i>Compraste {money(report.card_charged)} con tarjeta este mes; "
+            f"eso cae en cortes posteriores.</i>"
+        )
 
     if report.by_category:
         lines += [

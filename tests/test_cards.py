@@ -185,3 +185,24 @@ async def test_compra_corriente_no_cuenta_como_diferido(session):
         session.add(inst)
     await session.flush()
     assert await deferred_purchases(session, period="2026-08") == []
+
+
+async def test_tarjeta_sin_saldo_no_dice_que_vencio(session):
+    """Un corte en cero no está vencido aunque su fecha ya pasó."""
+    from app.services.cards import statement
+
+    card = Account(name="Sin uso", type=ACCOUNT_CREDIT, cut_day=20, due_day=10)
+    session.add(card)
+    await session.flush()
+    resumen = await statement(session, card, "2020-01")
+    assert resumen.to_pay == D("0.00")
+    assert resumen.is_overdue is False
+    assert resumen.days_left < 0
+
+
+def test_ventana_usa_el_corte_por_defecto_si_falta():
+    from app.services.cards import cut_day_of, statement_window
+
+    sin_fechas = Account(id=9, name="Nueva", type=ACCOUNT_CREDIT)
+    start, end = statement_window("2026-08", cut_day_of(sin_fechas))
+    assert end.day == 20 and start.day == 21

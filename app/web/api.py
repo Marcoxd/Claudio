@@ -15,6 +15,7 @@ from app.money import ZERO
 from app.services import buffer as buffer_service
 from app.services.cards import (
     card_balance,
+    cut_day_of,
     deferred_purchases,
     future_commitments,
     place_purchase,
@@ -78,7 +79,7 @@ async def dashboard(
     for summary in report.statements:
         card = summary.account
         used = await card_balance(session, card)
-        window = statement_window(summary.period, card.cut_day or 0)
+        window = statement_window(summary.period, cut_day_of(card))
         hoy = place_purchase(card, today(), ZERO, 1)
         cards.append(
             {

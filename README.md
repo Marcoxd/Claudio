@@ -123,6 +123,31 @@ Escríbele `/start` al bot (el primero que escriba queda como dueño) y luego
 
 ---
 
+## ¿Ya llevas los gastos en Excel?
+
+`scripts/importar_excel.py` lee un libro con una hoja por mes y carga fijos,
+tarjetas, personas, colchón y las compras a cuotas en curso.
+
+```bash
+# primero mira qué haría, sin tocar nada
+PYTHONPATH=. python scripts/importar_excel.py Gastos.xlsx --anio 2026
+
+# cuando te cuadre
+PYTHONPATH=. python scripts/importar_excel.py Gastos.xlsx --anio 2026 \
+    --tarjeta "Pacífico" --colchon 989.12 --personas "Ana,Luis" --aplicar
+```
+
+Espera este formato por hoja: **A** descripción, **B** total de la compra,
+**C** valor del mes, **D** tarjeta o número de cuota, **E/F** el bloque de
+resumen con los fijos y el sueldo. Un diferido se reconoce por su fórmula
+(`=B6/3` son tres cuotas), no por la proporción, para no confundir una
+coincidencia con cuotas.
+
+De paso te avisa de los números escritos como texto (`17,46` con coma) que
+Excel no estaba sumando.
+
+---
+
 ## Correrlo en tu máquina
 
 ```bash
