@@ -206,3 +206,38 @@ def test_ventana_usa_el_corte_por_defecto_si_falta():
     sin_fechas = Account(id=9, name="Nueva", type=ACCOUNT_CREDIT)
     start, end = statement_window("2026-08", cut_day_of(sin_fechas))
     assert end.day == 20 and start.day == 21
+
+
+# Verificado contra un estado de cuenta PacifiCard real (corte 24, pago 8):
+# "Período de corte desde 25/JUL/2026 hasta 24/AGO/2026,
+#  fecha máxima de pago sin recargos 08/SEP/2026".
+PACIFICARD_CORTE, PACIFICARD_PAGO = 24, 8
+
+
+def test_pacificard_ventana_y_vencimiento_reales():
+    from app.services.cards import statement_window
+
+    assert statement_window("2026-08", PACIFICARD_CORTE) == (
+        dt.date(2026, 7, 25),
+        dt.date(2026, 8, 24),
+    )
+    assert due_date_for("2026-08", PACIFICARD_CORTE, PACIFICARD_PAGO) == dt.date(2026, 9, 8)
+
+
+def test_pacificard_asigna_cada_consumo_a_su_corte():
+    """Fechas tomadas de los movimientos del estado de cuenta."""
+    en_el_corte_de_agosto = [
+        dt.date(2026, 7, 26),   # el consumo más viejo del período
+        dt.date(2026, 7, 30),
+        dt.date(2026, 7, 31),
+        dt.date(2026, 8, 1),
+        dt.date(2026, 8, 17),
+        dt.date(2026, 8, 24),   # el mismo día del corte entra
+    ]
+    for fecha in en_el_corte_de_agosto:
+        assert statement_period_for(fecha, PACIFICARD_CORTE) == "2026-08"
+
+    # un día después del corte ya es del mes siguiente
+    assert statement_period_for(dt.date(2026, 8, 25), PACIFICARD_CORTE) == "2026-09"
+    # y el día del corte anterior pertenece al corte anterior
+    assert statement_period_for(dt.date(2026, 7, 24), PACIFICARD_CORTE) == "2026-07"

@@ -134,8 +134,13 @@ PYTHONPATH=. python scripts/importar_excel.py Gastos.xlsx --anio 2026
 
 # cuando te cuadre
 PYTHONPATH=. python scripts/importar_excel.py Gastos.xlsx --anio 2026 \
-    --tarjeta "Pacífico" --colchon 989.12 --personas "Ana,Luis" --aplicar
+    --tarjeta "Pacífico" --corte 24 --pago 8 \
+    --colchon 989.12 --personas "Ana,Luis" --aplicar
 ```
+
+`--corte` y `--pago` salen de la primera página de tu estado de cuenta, donde
+dice **Fecha de corte** y **Fecha máxima de pago sin recargos**. Son lo único
+que el bot no puede adivinar y de lo que depende todo lo demás.
 
 Espera este formato por hoja: **A** descripción, **B** total de la compra,
 **C** valor del mes, **D** tarjeta o número de cuota, **E/F** el bloque de

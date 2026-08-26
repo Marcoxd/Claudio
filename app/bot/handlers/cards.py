@@ -222,9 +222,13 @@ async def cmd_cuts(message: Message, session: AsyncSession) -> None:
     for card in cards:
         placement = place_purchase(card, hoy, ZERO, 1)
         lines.append(f"<b>{card.name}</b>")
-        lines.append(
-            f"Corte el {card.cut_day} · pago el {card.due_day}"
-        )
+        if card.cut_day and card.due_day:
+            lines.append(f"Corte el {card.cut_day} · pago el {card.due_day}")
+        else:
+            lines.append(
+                f"<i>Sin fechas configuradas: uso corte {cut_day_of(card)} y "
+                f"pago {due_day_of(card)} como supuesto.</i>"
+            )
         lines.append(
             f"Lo que compres hoy entra al corte del "
             f"{date_es(placement.cut_date)} y lo pagas el "
@@ -291,9 +295,15 @@ async def cb_card_edit(callback: CallbackQuery, session: AsyncSession) -> None:
         return
     hoy = today()
     placement = place_purchase(card, hoy, ZERO, 1)
+    fechas = (
+        f"Corte el {card.cut_day} · pago el {card.due_day}"
+        if card.cut_day and card.due_day
+        else f"<i>Sin configurar (supongo corte {cut_day_of(card)}, "
+             f"pago {due_day_of(card)})</i>"
+    )
     await callback.message.answer(
         f"<b>{card.name}</b>\n"
-        f"Corte el {card.cut_day} · pago el {card.due_day}"
+        + fechas
         + (f" · cupo {money(card.credit_limit)}" if card.credit_limit else "")
         + f"\n\nLo que compres hoy cae en el corte del "
         f"{date_es(placement.cut_date)} y se paga el {date_es(placement.due_date)}.\n\n"

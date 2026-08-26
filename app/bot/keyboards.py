@@ -177,7 +177,11 @@ def card_list(cards) -> InlineKeyboardMarkup:
     rows = [
         [
             InlineKeyboardButton(
-                text=f"{c.name} · corte {c.cut_day or '?'} · pago {c.due_day or '?'}",
+                text=(
+                    f"{c.name} · corte {c.cut_day} · pago {c.due_day}"
+                    if c.cut_day and c.due_day
+                    else f"{c.name} · sin fechas"
+                ),
                 callback_data=f"c:edit:{c.id}",
             )
         ]

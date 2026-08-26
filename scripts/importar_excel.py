@@ -213,7 +213,8 @@ def _fecha_en_texto(texto: str, anio: int, mes: int) -> dt.date | None:
 # --------------------------------------------------------------- escritura
 
 
-async def aplicar(informe: Informe, tarjeta_default: str, colchon: Decimal, personas: list[str]):
+async def aplicar(informe: Informe, tarjeta_default: str, colchon: Decimal,
+                  personas: list[str], corte: int | None = None, pago: int | None = None):
     async with SessionLocal() as s:
         cats = {c.name: c for c in (await s.execute(select(Category))).scalars().all()}
         nombres_cat = list(cats)
@@ -228,6 +229,9 @@ async def aplicar(informe: Informe, tarjeta_default: str, colchon: Decimal, pers
                 cuenta = Account(name=nombre, type=ACCOUNT_CREDIT)
                 s.add(cuenta)
                 await s.flush()
+            if nombre == tarjeta_default:
+                cuenta.cut_day = corte or cuenta.cut_day
+                cuenta.due_day = pago or cuenta.due_day
             tarjetas[nombre] = cuenta
         predeterminada = tarjetas.get(tarjeta_default) or next(iter(tarjetas.values()))
 
@@ -384,6 +388,10 @@ async def main() -> None:
     parser.add_argument("--anio", type=int, default=dt.date.today().year)
     parser.add_argument("--tarjeta", default="Tarjeta",
                         help="tarjeta a la que asignar lo que no diga cuál")
+    parser.add_argument("--corte", type=int, default=None,
+                        help="día de corte de esa tarjeta (mira tu estado de cuenta)")
+    parser.add_argument("--pago", type=int, default=None,
+                        help="día máximo de pago de esa tarjeta")
     parser.add_argument("--colchon", type=Decimal, default=Decimal(0),
                         help="dinero ajeno que administras")
     parser.add_argument("--personas", default="",
@@ -404,10 +412,15 @@ async def main() -> None:
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.drop_all)
     await init_db()
-    await aplicar(informe, args.tarjeta, D(args.colchon), personas)
+    await aplicar(informe, args.tarjeta, D(args.colchon), personas,
+                  args.corte, args.pago)
     print("\n✔ Cargado. Revisa /resumen y /tarjetas en el bot.")
-    print("  Falta lo único que no está en la hoja: el día de corte y de pago")
-    print("  de cada tarjeta. Ponlos con /tarjetas → Editar fechas.")
+    faltan = [t for t in sorted(informe.tarjetas) if t != args.tarjeta or not args.corte]
+    if faltan:
+        print("  Falta el día de corte y de pago de: " + ", ".join(faltan))
+        print("  Están en la primera página del estado de cuenta, como")
+        print("  «Fecha de corte» y «Fecha máxima de pago sin recargos».")
+        print("  Ponlos con /tarjetas → Editar fechas.")
 
 
 if __name__ == "__main__":

@@ -191,3 +191,15 @@ async def test_detalle_de_corte_vacio(poblado):
     m = FakeMessage()
     await cards_h.cb_statement_detail(FakeCallback(f"c:det:{card.id}:2027-01", m), poblado)
     assert "No hay movimientos" in m.sent[0]
+
+
+async def test_corte_avisa_cuando_la_tarjeta_no_tiene_fechas(session):
+    from app.models import ACCOUNT_CREDIT, Account
+
+    session.add(Account(name="Nueva", type=ACCOUNT_CREDIT))
+    await session.flush()
+
+    m = FakeMessage("/corte")
+    await cards_h.cmd_cuts(m, session)
+    assert "Sin fechas configuradas" in m.sent[0]
+    assert "None" not in m.sent[0]
