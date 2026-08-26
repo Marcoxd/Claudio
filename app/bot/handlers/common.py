@@ -28,6 +28,7 @@ def welcome_text() -> str:
         "/tarjetas — cortes, cuotas y cuánto pagar\n"
         "/corte — en qué mes cae lo que compres hoy\n"
         "/diferidos — cuánto falta de cada compra a cuotas\n"
+        "/conciliar — cruzar el estado de cuenta del banco\n"
         "/fijos — arriendo, internet, préstamos…\n"
         "/deudas — quién te debe de las salidas\n"
         "/colchon — el dinero que no es tuyo\n"
@@ -66,6 +67,9 @@ ver los movimientos de un corte o cambiarle las fechas.
 /corte te dice, para cada tarjeta, en qué mes va a caer lo que compres hoy.
 /nuevatarjeta agrega una.
 /diferidos te dice cuánto falta de cada compra a cuotas.
+/conciliar cruza el PDF del estado de cuenta con lo que tienes registrado: te
+dice qué te faltó anotar, qué cobró distinto el banco y qué no es de ese corte.
+Sirve sobre todo si compartes la tarjeta con alguien más.
 
 Al anotar un gasto con tarjeta te digo al instante a qué corte entra y cuándo
 lo pagas, antes de que confirmes. Los diferidos se reparten mes a mes solos.

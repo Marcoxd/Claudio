@@ -38,6 +38,12 @@ Studio, tier gratuito).
   ahí abres el **detalle de un corte** (qué compras entraron, con sus fechas) o
   le **cambias las fechas** a una tarjeta.
 - `/nuevatarjeta` agrega una sin volver a pasar por `/setup`.
+- **`/conciliar`**: le mandas el PDF del estado de cuenta y cruza cada
+  movimiento del banco contra lo que registraste. Te dice qué ya tenías, qué
+  te faltó anotar, dónde el banco cobró distinto y qué no pertenece a ese
+  corte. Con un toque agrega los faltantes, corrige los montos, registra los
+  pagos y te fija el día de corte y de pago leídos del propio estado.
+  Indispensable si compartes la tarjeta con alguien más.
 - `/diferidos` te dice de cada compra a cuotas cuántas llevas, cuánto falta y
   cuánto se te va cada mes solo en cuotas.
 

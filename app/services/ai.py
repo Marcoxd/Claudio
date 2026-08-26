@@ -52,11 +52,62 @@ class ParsedCapture(BaseModel):
     installments: int = 1               # diferido a N meses
     people: list[str] = Field(default_factory=list)
     split_mode: Literal["", "equal", "items"] = ""
+    is_statement: bool = False          # ¿es un estado de cuenta, no un recibo?
     is_buffer: bool = False             # ¿usó/repuso el colchón?
     buffer_direction: Literal["", "use", "repay"] = ""
     items: list[ParsedItem] = Field(default_factory=list)
     notes: str = ""
     confidence: float = 0.5
+
+
+class StatementLine(BaseModel):
+    date: str = ""                 # YYYY-MM-DD
+    description: str = ""
+    amount: float = 0
+    kind: Literal["consumo", "pago", "cuota", "interes", "otro"] = "consumo"
+    installment: str = ""          # "02/06" si es cuota de un diferido
+    deferred_balance: float = 0    # saldo que queda de ese diferido
+
+
+class ParsedStatement(BaseModel):
+    card_name: str = ""            # como lo llama el banco
+    bank: str = ""
+    period_start: str = ""         # YYYY-MM-DD, inicio del período de corte
+    period_end: str = ""           # YYYY-MM-DD, la fecha de corte
+    due_date: str = ""             # YYYY-MM-DD, pago máximo sin recargos
+    total_due: float = 0           # total a pagar de contado
+    minimum_due: float = 0
+    previous_balance: float = 0
+    credit_limit: float = 0
+    available: float = 0
+    total_debt: float = 0
+    lines: list[StatementLine] = Field(default_factory=list)
+    notes: str = ""
+    confidence: float = 0.5
+
+
+SYSTEM_STATEMENT = """Eres el motor de lectura de estados de cuenta de tarjetas de crédito
+ecuatorianas (PacifiCard, Diners, Banco Pichincha, Produbanco, Guayaquil, Bolivariano).
+Muchos llegan escaneados: lee la imagen con cuidado.
+
+Devuelve SIEMPRE un único JSON con:
+- `period_start` y `period_end`: el "Período de corte desde X hasta Y". `period_end`
+  es la fecha de corte.
+- `due_date`: la "Fecha máxima de pago sin recargos".
+- `total_due`: el "Total a Pagar de contado". `minimum_due`: el "Mínimo a pagar".
+- `credit_limit` (cupo autorizado), `available` (disponible), `total_debt` (deuda total).
+- `lines`: TODOS los movimientos del detalle, uno por fila.
+  · kind="consumo" para compras (CONS), "pago" para abonos (PAGO), "cuota" para
+    los diferidos (DIF), "interes" para intereses y cargos.
+  · `installment`: si la fila dice 02/06, ponlo tal cual. `deferred_balance`: el
+    "SALDO DIFERIDO" de esa fila si aparece.
+  · `date`: el año no siempre está en la fila; dedúcelo del período de corte.
+    Una fila de JUL/30 dentro de un corte que va de 25/JUL/2026 a 24/AGO/2026
+    es 2026-07-30.
+  · `amount` siempre positivo; el signo lo da `kind`.
+- Incluye los consumos de todos los tarjetahabientes y también los del exterior.
+- No inventes filas. Si una no se lee, omítela y dilo en `notes`.
+"""
 
 
 SYSTEM = """Eres el motor de extracción de un bot de finanzas personales en español (Ecuador, moneda USD).
@@ -83,6 +134,9 @@ Reglas:
   El emisor (la tienda) va en `merchant`, no el cliente.
 - `confidence` entre 0 y 1 según qué tan seguro estás del monto total.
 - Si no logras identificar un monto, devuelve kind="unknown" y amount=0.
+- Si el archivo es un ESTADO DE CUENTA de tarjeta (trae "fecha de corte",
+  "pago mínimo", "cupo" y una lista larga de movimientos), no lo trates como
+  recibo: pon is_statement=true y amount=0.
 """
 
 
@@ -213,3 +267,41 @@ async def answer_question(question: str, context_text: str) -> str:
     except Exception as exc:
         log.warning("Gemini falló respondiendo: %s", exc)
         return f"No pude consultar el modelo ahora mismo ({exc.__class__.__name__})."
+
+
+async def parse_statement(data: bytes, mime_type: str, ctx: dict) -> ParsedStatement:
+    """Lee un estado de cuenta completo: fechas de corte y todos los movimientos."""
+    if not settings.ai_enabled:
+        raise RuntimeError("Conciliar un estado de cuenta necesita GEMINI_API_KEY")
+    from google.genai import types
+
+    config = types.GenerateContentConfig(
+        system_instruction=SYSTEM_STATEMENT,
+        response_mime_type="application/json",
+        response_schema=ParsedStatement,
+        temperature=0.0,
+        max_output_tokens=32768,
+    )
+    contents = [
+        types.Part.from_text(text=_context_block(ctx)),
+        types.Part.from_bytes(data=data, mime_type=mime_type),
+    ]
+    last: Exception | None = None
+    for intento in range(3):
+        try:
+            respuesta = await client().aio.models.generate_content(
+                model=settings.gemini_model, contents=contents, config=config
+            )
+            parsed = getattr(respuesta, "parsed", None)
+            if isinstance(parsed, ParsedStatement):
+                return parsed
+            texto = (respuesta.text or "").strip()
+            if texto.startswith("```"):
+                texto = texto.strip("`").split("\n", 1)[-1]
+            return ParsedStatement.model_validate(json.loads(texto))
+        except Exception as exc:
+            last = exc
+            log.warning("Gemini falló leyendo el estado (intento %s): %s", intento + 1, exc)
+            if intento < 2:
+                await asyncio.sleep(2 * (intento + 1))
+    raise RuntimeError(f"No pude leer el estado de cuenta: {last}")

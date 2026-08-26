@@ -45,7 +45,7 @@ async def on_voice(message: Message, session: AsyncSession, bot: Bot) -> None:
     if media.file_size and media.file_size > MAX_FILE_MB * 1024 * 1024:
         await message.answer("El audio es muy pesado. Mándame uno más corto.")
         return
-    note = await message.answer("🎧 Escuchando…")
+    note = await message.answer("Escuchando…")
     try:
         data = await _download(bot, media.file_id)
         ctx = await build_context(session)
@@ -55,7 +55,7 @@ async def on_voice(message: Message, session: AsyncSession, bot: Bot) -> None:
         )
     except Exception:
         log.exception("Error procesando nota de voz")
-        await note.edit_text("😖 No pude procesar el audio. Intenta escribiéndolo.")
+        await note.edit_text("No pude procesar el audio. Intenta escribiéndolo.")
         return
     await note.delete()
     await _send_draft(message, session, payload)
@@ -64,7 +64,7 @@ async def on_voice(message: Message, session: AsyncSession, bot: Bot) -> None:
 @router.message(F.photo)
 async def on_photo(message: Message, session: AsyncSession, bot: Bot) -> None:
     photo = message.photo[-1]
-    note = await message.answer("🔎 Leyendo el recibo…")
+    note = await message.answer("Leyendo el recibo…")
     try:
         data = await _download(bot, photo.file_id)
         ctx = await build_context(session)
@@ -75,7 +75,7 @@ async def on_photo(message: Message, session: AsyncSession, bot: Bot) -> None:
         )
     except Exception:
         log.exception("Error procesando foto")
-        await note.edit_text("😖 No pude leer la imagen. Prueba con más luz o escríbelo.")
+        await note.edit_text("No pude leer la imagen. Prueba con más luz o escríbelo.")
         return
     await note.delete()
     await _send_draft(message, session, payload)
@@ -91,7 +91,7 @@ async def on_document(message: Message, session: AsyncSession, bot: Bot) -> None
     if doc.file_size and doc.file_size > MAX_FILE_MB * 1024 * 1024:
         await message.answer(f"El archivo pasa de {MAX_FILE_MB} MB.")
         return
-    note = await message.answer("📄 Leyendo la factura…")
+    note = await message.answer("Leyendo la factura…")
     try:
         data = await _download(bot, doc.file_id)
         ctx = await build_context(session)
@@ -102,7 +102,14 @@ async def on_document(message: Message, session: AsyncSession, bot: Bot) -> None
         )
     except Exception:
         log.exception("Error procesando documento")
-        await note.edit_text("😖 No pude leer el archivo.")
+        await note.edit_text("No pude leer el archivo.")
+        return
+    if parsed.is_statement:
+        await note.edit_text(
+            "Esto parece un <b>estado de cuenta</b>, no un recibo.\n\n"
+            "Usa /conciliar y vuelve a mandármelo: te digo qué consumos ya "
+            "tenías, cuáles te faltó anotar y cuáles no son de ese corte."
+        )
         return
     await note.delete()
     await _send_draft(message, session, payload)
@@ -117,7 +124,7 @@ async def on_text(message: Message, session: AsyncSession) -> None:
     parsed = await ai.parse_text(text, ctx)
     if parsed.kind == "unknown" or not parsed.amount:
         await message.answer(
-            "🤔 No encontré un monto en ese mensaje.\n"
+            "No encontré un monto en ese mensaje.\n"
             "Prueba con algo como <code>almuerzo 12.50 con la visa</code>, "
             "o usa /ayuda para ver ejemplos."
         )
