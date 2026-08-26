@@ -10,11 +10,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.bot.keyboards import card_actions, card_fields, card_list
 from app.models import ACCOUNT_CREDIT, Account, CardPayment
-from app.money import D, ZERO
+from app.money import D, ZERO, total
 from app.services.cards import (
     card_balance,
     credit_cards,
     cut_day_of,
+    deferred_purchases,
     due_day_of,
     future_commitments,
     place_purchase,
@@ -413,3 +414,47 @@ async def step_new_limit(message: Message, state: FSMContext, session: AsyncSess
         + f".\n\nLo que compres hoy con ella cae en el corte del "
         f"{date_es(placement.cut_date)} y lo pagas el {date_es(placement.due_date)}."
     )
+
+
+# --------------------------------------------------------------- diferidos
+
+
+@router.message(Command("diferidos", "cuotas"))
+async def cmd_deferred(message: Message, session: AsyncSession) -> None:
+    """Cuánto falta por pagar de cada compra a cuotas."""
+    compras = await deferred_purchases(session)
+    if not compras:
+        await message.answer(
+            "No tienes compras a cuotas con saldo pendiente.\n\n"
+            "Cuando anotes algo como <code>tv 899 diferido a 12 meses con visa</code> "
+            "aquí verás cuánto te falta de cada una."
+        )
+        return
+
+    lines = ["<b>Compras a cuotas</b>", ""]
+    detalle = []
+    for c in compras:
+        nombre = c.transaction.description[:22]
+        faltan = "1 cuota" if c.remaining == 1 else f"{c.remaining} cuotas"
+        lines.append(f"<b>{nombre}</b> · {c.account.name}")
+        lines.append(
+            f"{money(c.total)} a {c.count} meses · {money(c.installment)} al mes"
+        )
+        lines.append(
+            f"Pagadas {c.paid} de {c.count} · faltan {faltan}: "
+            f"<b>{money(c.remaining_amount)}</b>"
+        )
+        lines.append("")
+        detalle.append(row(nombre, money(c.remaining_amount), 34))
+
+    if len(compras) > 1:
+        lines.append(block(detalle))
+    lines.append(
+        f"<b>Te falta pagar {money(total(c.remaining_amount for c in compras))} "
+        f"en cuotas.</b>"
+    )
+    lines.append(
+        f"Cada mes se te van {money(total(c.installment for c in compras))} "
+        f"solo en diferidos."
+    )
+    await message.answer("\n".join(lines))

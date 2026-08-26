@@ -93,8 +93,14 @@ def split_menu(draft_id: int, has_items: bool) -> InlineKeyboardMarkup:
 
 
 def people_picker(draft_id: int, people: list[tuple[int, str]], selected: set[int],
-                  mode: str = "equal") -> InlineKeyboardMarkup:
+                  mode: str = "equal", include_me: bool = True) -> InlineKeyboardMarkup:
     buttons = [
+        InlineKeyboardButton(
+            text=("✅ " if include_me else "▫️ ") + "Yo",
+            callback_data=f"s:me:{draft_id}:{mode}",
+        )
+    ]
+    buttons += [
         InlineKeyboardButton(
             text=("✅ " if pid in selected else "▫️ ") + name[:20],
             callback_data=f"s:tog:{draft_id}:{pid}:{mode}",

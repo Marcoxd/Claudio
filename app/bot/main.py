@@ -19,6 +19,7 @@ COMMANDS = [
     BotCommand(command="resumen", description="Cómo va el mes"),
     BotCommand(command="tarjetas", description="Cortes, cuotas y cuánto pagar"),
     BotCommand(command="corte", description="En qué mes cae lo que compres hoy"),
+    BotCommand(command="diferidos", description="Cuánto falta de cada compra a cuotas"),
     BotCommand(command="fijos", description="Gastos fijos del mes"),
     BotCommand(command="deudas", description="Quién te debe"),
     BotCommand(command="colchon", description="El dinero que no es tuyo"),

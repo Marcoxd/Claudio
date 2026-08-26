@@ -113,3 +113,75 @@ def test_compra_con_debito_no_tiene_corte():
 
     debito = Account(id=2, name="Débito", type=ACCOUNT_DEBIT)
     assert place_purchase(debito, dt.date(2026, 8, 26), D("10"), 1) is None
+
+
+async def test_saldo_pendiente_de_un_diferido(session):
+    from app.models import STATUS_DONE
+    from app.services.cards import deferred_purchases
+
+    card = Account(name="Pacífico", type=ACCOUNT_CREDIT, cut_day=20, due_day=10)
+    session.add(card)
+    await session.flush()
+
+    tx = Transaction(
+        kind="expense", status=STATUS_DONE, date=dt.date(2026, 6, 10),
+        period="2026-06", amount=D("182.16"), description="Patprimo",
+        account_id=card.id, installments_total=6,
+    )
+    session.add(tx)
+    await session.flush()
+    for inst in build_installments(tx, card, 6):
+        session.add(inst)
+    await session.flush()
+
+    # en agosto ya cerraron los cortes de junio, julio y agosto: 3 de 6
+    compras = await deferred_purchases(session, period="2026-08")
+    assert len(compras) == 1
+    compra = compras[0]
+    assert compra.count == 6
+    assert compra.paid == 3
+    assert compra.remaining == 3
+    assert compra.installment == D("30.36")
+    assert compra.remaining_amount == D("91.08")
+    assert compra.next_period == "2026-09"
+
+
+async def test_diferido_terminado_no_aparece(session):
+    from app.models import STATUS_DONE
+    from app.services.cards import deferred_purchases
+
+    card = Account(name="Titanium", type=ACCOUNT_CREDIT, cut_day=5, due_day=25)
+    session.add(card)
+    await session.flush()
+    tx = Transaction(
+        kind="expense", status=STATUS_DONE, date=dt.date(2026, 1, 10),
+        period="2026-01", amount=D("300"), description="Llantas",
+        account_id=card.id, installments_total=3,
+    )
+    session.add(tx)
+    await session.flush()
+    for inst in build_installments(tx, card, 3):
+        session.add(inst)
+    await session.flush()
+
+    assert await deferred_purchases(session, period="2026-08") == []
+
+
+async def test_compra_corriente_no_cuenta_como_diferido(session):
+    from app.models import STATUS_DONE
+    from app.services.cards import deferred_purchases
+
+    card = Account(name="Visa", type=ACCOUNT_CREDIT, cut_day=20, due_day=10)
+    session.add(card)
+    await session.flush()
+    tx = Transaction(
+        kind="expense", status=STATUS_DONE, date=dt.date(2026, 8, 10),
+        period="2026-08", amount=D("40"), description="Gasolina",
+        account_id=card.id,
+    )
+    session.add(tx)
+    await session.flush()
+    for inst in build_installments(tx, card, 1):
+        session.add(inst)
+    await session.flush()
+    assert await deferred_purchases(session, period="2026-08") == []

@@ -15,6 +15,7 @@ from app.money import ZERO
 from app.services import buffer as buffer_service
 from app.services.cards import (
     card_balance,
+    deferred_purchases,
     future_commitments,
     place_purchase,
     statement_window,
@@ -111,6 +112,20 @@ async def dashboard(
             }
         )
 
+    diferidos = [
+        {
+            "label": d.transaction.description,
+            "card": d.account.name,
+            "paid": d.paid,
+            "count": d.count,
+            "installment": d.installment,
+            "remaining": d.remaining_amount,
+            "total": d.total,
+            "pct": pct(d.paid, d.count),
+        }
+        for d in await deferred_purchases(session, period)
+    ]
+
     top = report.by_category[:10]
     biggest = top[0].amount if top else ZERO
     categories = [
@@ -136,6 +151,7 @@ async def dashboard(
         "is_current": period == current_period(),
         "r": report,
         "cards": cards,
+        "deferred": diferidos,
         "categories": categories,
         "flow": flow,
         "debts": debts,

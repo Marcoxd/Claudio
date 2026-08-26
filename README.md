@@ -38,9 +38,13 @@ Studio, tier gratuito).
   ahí abres el **detalle de un corte** (qué compras entraron, con sus fechas) o
   le **cambias las fechas** a una tarjeta.
 - `/nuevatarjeta` agrega una sin volver a pasar por `/setup`.
+- `/diferidos` te dice de cada compra a cuotas cuántas llevas, cuánto falta y
+  cuánto se te va cada mes solo en cuotas.
 
 **Cuentas compartidas**
 - `cena 96 con Ana y Luis` → divide en partes iguales.
+- ¿Lo pagaste tú pero el gasto es de ellos? Destilda **Yo** en la lista de
+  personas: te deben el total y a ti no te cuenta como gasto.
 - Recibo con ítems → **marcas quién consumió qué** y el IVA y la propina se
   prorratean solos según lo que comió cada quien.
 - `/deudas` lleva quién te debe; cuando te pagan, saldas con un toque.
@@ -61,6 +65,7 @@ Studio, tier gratuito).
 - Ingresos vs. gastos, en qué se te va la plata, tarjetas, deudas, colchón.
 - Por tarjeta: qué rango de compras cubre el corte que estás pagando, la lista
   de movimientos que entraron y a qué corte irá lo que compres hoy.
+- Compras a cuotas: cuántas llevas pagadas y cuánto queda de cada una.
 - Modo claro y oscuro, funciona en el celular.
 - Sin pedir nada a servidores externos: ni fuentes, ni scripts, ni CDNs.
 

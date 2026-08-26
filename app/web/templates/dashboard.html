@@ -243,6 +243,37 @@
         {% endif %}
       </section>
 
+      <!-- ---------------------------------------------------- diferidos -->
+      {% if deferred %}
+      <section class="card">
+        <h2>Compras a cuotas</h2>
+        <div class="list">
+          {% for d in deferred %}
+          <div class="cc">
+            <div class="cc-head">
+              <span class="n">{{ d.label[:26] }}</span>
+              <span class="a">{{ d.remaining | money }}</span>
+            </div>
+            <div class="cc-meta">
+              <span>{{ d.card }}</span>
+              <span>{{ d.installment | money }} al mes</span>
+              <span>pagadas {{ d.paid }} de {{ d.count }}</span>
+            </div>
+            <div class="cupo" role="img"
+                 aria-label="Pagadas {{ d.paid }} de {{ d.count }} cuotas">
+              <i style="width: {{ '%.1f' % ([d.pct, 100] | min) }}%"></i>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <p class="cc-meta hoy">
+          <span>Te falta pagar
+            {{ deferred | sum(attribute='remaining') | money }} en cuotas,
+            {{ deferred | sum(attribute='installment') | money }} cada mes.</span>
+        </p>
+      </section>
+      {% endif %}
+
       <!-- ------------------------------------------------------ colchón -->
       {% if buffer.total > 0 %}
       <section class="card">

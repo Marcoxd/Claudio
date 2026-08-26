@@ -104,7 +104,15 @@ def draft_summary(payload: dict, category_name: str, account_name: str,
 
     if people_names:
         lines.append("")
-        lines.append(f"Dividido con {', '.join(people_names)}")
+        quienes = ", ".join(people_names)
+        if payload.get("include_me", True):
+            partes = len(people_names) + 1
+            lines.append(
+                f"Dividido con {quienes} · te tocan "
+                f"{money(D(payload['amount']) / partes)}"
+            )
+        else:
+            lines.append(f"Es de {quienes}: lo pagaste tú, pero no es gasto tuyo.")
 
     if payload.get("buffer_direction") == "use":
         lines.append(f"\nSale del {settings.buffer_name.lower()}")

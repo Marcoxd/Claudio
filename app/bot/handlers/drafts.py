@@ -248,7 +248,12 @@ async def cb_split_equal(callback: CallbackQuery, session: AsyncSession) -> None
         await callback.answer()
         return
     await callback.message.edit_reply_markup(
-        reply_markup=people_picker(draft.id, people, set(payload.get("people_ids") or []))
+        reply_markup=people_picker(
+            draft.id,
+            people,
+            set(payload.get("people_ids") or []),
+            include_me=bool(payload.get("include_me", True)),
+        )
     )
     await callback.answer()
 
@@ -266,14 +271,40 @@ async def cb_toggle_person(callback: CallbackQuery, session: AsyncSession) -> No
     payload["people_ids"] = sorted(selected)
     await update_draft(session, draft, payload)
     people = await _people_options(session)
+    include_me = bool(payload.get("include_me", True))
     await callback.message.edit_reply_markup(
-        reply_markup=people_picker(draft.id, people, selected, mode)
+        reply_markup=people_picker(draft.id, people, selected, mode, include_me)
     )
-    n = len(selected) + (1 if payload.get("include_me", True) else 0)
+    n = len(selected) + (1 if include_me else 0)
     if n:
         await callback.answer(f"{money(D(payload['amount']) / n)} cada uno")
     else:
         await callback.answer()
+
+
+@router.callback_query(F.data.startswith("s:me:"))
+async def cb_toggle_me(callback: CallbackQuery, session: AsyncSession) -> None:
+    """Sacarme de la división: el gasto es de otro, yo solo lo pagué."""
+    _, _, draft_id, mode = callback.data.split(":")
+    draft, payload = await load_draft(session, int(draft_id))
+    if draft is None:
+        await callback.answer("Borrador vencido", show_alert=True)
+        return
+    include_me = not bool(payload.get("include_me", True))
+    payload["include_me"] = include_me
+    await update_draft(session, draft, payload)
+
+    people = await _people_options(session)
+    selected = set(payload.get("people_ids") or [])
+    await callback.message.edit_reply_markup(
+        reply_markup=people_picker(draft.id, people, selected, mode, include_me)
+    )
+    if not include_me and selected:
+        await callback.answer("No te cuento: el gasto es de ellos")
+    elif not include_me:
+        await callback.answer("Elige de quién es el gasto")
+    else:
+        await callback.answer("Te cuento en la división")
 
 
 @router.callback_query(F.data.startswith("s:new:"))
@@ -318,9 +349,13 @@ async def cb_split_done(callback: CallbackQuery, session: AsyncSession) -> None:
     if not ids:
         await callback.answer("Elige al menos una persona", show_alert=True)
         return
+    include_me = bool(payload.get("include_me", True))
     payload["split_mode"] = "equal"
     await update_draft(session, draft, payload)
     await _refresh(callback, session, draft, payload)
+    if not include_me:
+        await callback.answer("Todo es de ellos, a ti no te cuenta")
+        return
     parts = split_evenly(D(payload["amount"]), len(ids) + 1)
     await callback.answer(f"Te toca {money(parts[0])}")
 
