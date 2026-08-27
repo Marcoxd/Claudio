@@ -96,13 +96,31 @@ class MonthReport:
         )
 
     @property
-    def real_expenses(self) -> Decimal:
-        """Gasto real del mes (lo mío, sin la parte de amigos)."""
+    def purchased(self) -> Decimal:
+        """Lo que compré este mes, aunque lo pague en cuotas más adelante.
+
+        Sirve para «¿en qué se me fue?»: una compra diferida entra completa el
+        mes que la hice.
+        """
         return D(self.fixed_total + self.cash_variable + self.card_charged)
 
     @property
+    def cash_out(self) -> Decimal:
+        """Lo que sale del bolsillo este mes: fijos, tarjetas por pagar y efectivo.
+
+        Es la misma definición que usa «te queda para gastar», para que el
+        número grande y el gráfico nunca se contradigan.
+        """
+        return D(self.fixed_total + self.cards_due + self.cash_variable)
+
+    # Alias histórico: el gasto del mes es lo que efectivamente sale.
+    @property
+    def real_expenses(self) -> Decimal:
+        return self.cash_out
+
+    @property
     def net(self) -> Decimal:
-        return D(self.income_total - self.real_expenses)
+        return D(self.income_total - self.cash_out)
 
 
 async def month_report(

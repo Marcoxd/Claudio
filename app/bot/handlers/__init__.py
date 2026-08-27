@@ -9,6 +9,7 @@ from app.bot.handlers import (
     drafts,
     fixed as fixed_handlers,
     people,
+    reconcile as reconcile_handlers,
     reports as reports_handlers,
     setup as setup_handlers,
 )
@@ -23,6 +24,7 @@ def build_router() -> Router:
     router.include_router(fixed_handlers.router)
     router.include_router(buffer_handlers.router)
     router.include_router(people.router)
+    router.include_router(reconcile_handlers.router)
     router.include_router(drafts.router)
     router.include_router(capture_handlers.router)   # catch-all al final
     return router

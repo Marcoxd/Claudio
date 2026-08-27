@@ -103,3 +103,30 @@ async def test_colchon_no_cuenta_como_dinero_propio(session):
 
     r = await month_report(session, PERIOD)
     assert r.income_total == D("0")   # el colchón nunca es ingreso
+
+
+async def test_el_numero_grande_y_el_flujo_usan_la_misma_definicion(session):
+    """`cash_out` y `available_to_spend` deben cuadrar contra el ingreso."""
+    await _base(session)
+    card = Account(name="Visa", type=ACCOUNT_CREDIT, cut_day=20, due_day=10)
+    session.add(card)
+    await session.flush()
+
+    # compra diferida de agosto: cae en cortes de agosto en adelante
+    compra = Transaction(
+        kind="expense", status=STATUS_DONE, date=dt.date(2026, 8, 5),
+        period=PERIOD, amount=D("1200"), description="TV", account_id=card.id,
+        installments_total=12,
+    )
+    session.add(compra)
+    await session.flush()
+    for inst in build_installments(compra, card, 12):
+        session.add(inst)
+    await session.flush()
+
+    r = await month_report(session, PERIOD)
+    # comprado incluye el televisor completo; lo que sale, solo lo que exige el corte
+    assert r.purchased == D("1635")          # 435 de fijos + 1200 del televisor
+    assert r.cash_out == D("435")            # el corte de agosto se paga en septiembre
+    assert r.income_total - r.cash_out == r.available_to_spend
+    assert r.net == r.income_total - r.cash_out

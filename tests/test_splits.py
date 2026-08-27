@@ -109,3 +109,26 @@ async def test_abono_parcial_deja_el_resto_pendiente(session):
     await settle_person(session, ana.id, D("20.00"))
     rest = await balances(session)
     assert rest[0].owes_me == D("30.00")
+
+
+async def test_gasto_que_no_es_mio_no_me_cuenta(session):
+    """Lo pagué yo, pero es de ellos: mi parte es cero y me deben todo."""
+    ana, luis = await _people(session, "Ana", "Luis")
+    tx = _tx("60.00")
+    session.add(tx)
+    apply_split(tx, SPLIT_EQUAL, person_ids=[ana.id, luis.id], include_me=False)
+    await session.flush()
+
+    assert tx.my_share == D("0.00")
+    assert tx.effective_amount() == D("0.00")
+    assert total(b.owes_me for b in await balances(session)) == D("60.00")
+
+
+async def test_gasto_de_una_sola_persona_ajena(session):
+    ana, = await _people(session, "Ana")
+    tx = _tx("29.14")
+    session.add(tx)
+    apply_split(tx, SPLIT_EQUAL, person_ids=[ana.id], include_me=False)
+    await session.flush()
+    assert tx.my_share == D("0.00")
+    assert (await balances(session))[0].owes_me == D("29.14")

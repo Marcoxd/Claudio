@@ -38,9 +38,19 @@ Studio, tier gratuito).
   ahí abres el **detalle de un corte** (qué compras entraron, con sus fechas) o
   le **cambias las fechas** a una tarjeta.
 - `/nuevatarjeta` agrega una sin volver a pasar por `/setup`.
+- **`/conciliar`**: le mandas el PDF del estado de cuenta y cruza cada
+  movimiento del banco contra lo que registraste. Te dice qué ya tenías, qué
+  te faltó anotar, dónde el banco cobró distinto y qué no pertenece a ese
+  corte. Con un toque agrega los faltantes, corrige los montos, registra los
+  pagos y te fija el día de corte y de pago leídos del propio estado.
+  Indispensable si compartes la tarjeta con alguien más.
+- `/diferidos` te dice de cada compra a cuotas cuántas llevas, cuánto falta y
+  cuánto se te va cada mes solo en cuotas.
 
 **Cuentas compartidas**
 - `cena 96 con Ana y Luis` → divide en partes iguales.
+- ¿Lo pagaste tú pero el gasto es de ellos? Destilda **Yo** en la lista de
+  personas: te deben el total y a ti no te cuenta como gasto.
 - Recibo con ítems → **marcas quién consumió qué** y el IVA y la propina se
   prorratean solos según lo que comió cada quien.
 - `/deudas` lleva quién te debe; cuando te pagan, saldas con un toque.
@@ -61,6 +71,7 @@ Studio, tier gratuito).
 - Ingresos vs. gastos, en qué se te va la plata, tarjetas, deudas, colchón.
 - Por tarjeta: qué rango de compras cubre el corte que estás pagando, la lista
   de movimientos que entraron y a qué corte irá lo que compres hoy.
+- Compras a cuotas: cuántas llevas pagadas y cuánto queda de cada una.
 - Modo claro y oscuro, funciona en el celular.
 - Sin pedir nada a servidores externos: ni fuentes, ni scripts, ni CDNs.
 
@@ -118,20 +129,76 @@ Escríbele `/start` al bot (el primero que escriba queda como dueño) y luego
 
 ---
 
+## ¿Ya llevas los gastos en Excel?
+
+`scripts/importar_excel.py` lee un libro con una hoja por mes y carga fijos,
+tarjetas, personas, colchón y las compras a cuotas en curso.
+
+```bash
+# primero mira qué haría, sin tocar nada
+PYTHONPATH=. python scripts/importar_excel.py Gastos.xlsx --anio 2026
+
+# cuando te cuadre
+PYTHONPATH=. python scripts/importar_excel.py Gastos.xlsx --anio 2026 \
+    --tarjeta "Pacífico" --corte 24 --pago 8 \
+    --colchon 989.12 --personas "Ana,Luis" --aplicar
+```
+
+`--corte` y `--pago` salen de la primera página de tu estado de cuenta, donde
+dice **Fecha de corte** y **Fecha máxima de pago sin recargos**. Son lo único
+que el bot no puede adivinar y de lo que depende todo lo demás.
+
+Espera este formato por hoja: **A** descripción, **B** total de la compra,
+**C** valor del mes, **D** tarjeta o número de cuota, **E/F** el bloque de
+resumen con los fijos y el sueldo. Un diferido se reconoce por su fórmula
+(`=B6/3` son tres cuotas), no por la proporción, para no confundir una
+coincidencia con cuotas.
+
+De paso te avisa de los números escritos como texto (`17,46` con coma) que
+Excel no estaba sumando.
+
+---
+
 ## Correrlo en tu máquina
 
 ```bash
 git clone <tu-repo> && cd kuri
+./scripts/arrancar.sh
+```
+
+Ese script crea el entorno, instala todo, revisa la configuración y arranca.
+La primera vez te crea el `.env` y te pide las dos claves.
+
+¿Prefieres a mano?
+
+```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+cp .env.example .env                      # llena las dos claves
 
-cp .env.example .env      # llena TELEGRAM_TOKEN y GEMINI_API_KEY
-python run_bot.py         # el bot por polling, sin webhook
+PYTHONPATH=. python scripts/verificar.py  # ¿está todo bien?
+python run_bot.py                         # el bot, por polling
 
 # en otra terminal, el panel:
 uvicorn app.main:app --reload
-# ábrelo en http://localhost:8000/?t=TU_DASHBOARD_TOKEN
+# http://localhost:8000/?t=TU_DASHBOARD_TOKEN
 ```
+
+`scripts/verificar.py` comprueba que el token de Telegram sea válido, que la
+clave de Gemini responda y que la base esté accesible. Cuando algo no arranque,
+empieza por ahí.
+
+¿Quieres probarlo sin Telegram? `scripts/simular.py` levanta el bot completo
+—los mismos routers, middlewares y estados— con una sesión de Telegram
+simulada, y conversas por la terminal:
+
+```bash
+PYTHONPATH=. python scripts/simular.py            # conversación
+PYTHONPATH=. python scripts/simular.py --guion    # una demo de corrido
+```
+
+Escribes como en el chat; «1», «2»… pulsan los botones. Sirve para probar
+cambios sin tocar tu bot de verdad, y para enseñárselo a alguien.
 
 ¿Quieres verlo con datos de ejemplo antes de configurar nada?
 

@@ -184,6 +184,16 @@ class Transaction(Base, TimestampMixin):
         back_populates="transaction", cascade="all, delete-orphan", lazy="selectin"
     )
 
+    def __init__(self, **kwargs):
+        # Las relaciones de un objeto recién creado no quedan "cargadas" salvo
+        # que alguien las toque. Después del flush, leer una sin cargar dispara
+        # una consulta perezosa, y en async eso revienta con MissingGreenlet.
+        # Inicializarlas aquí evita tener que acordarse en cada sitio.
+        kwargs.setdefault("items", [])
+        kwargs.setdefault("installments", [])
+        kwargs.setdefault("split", None)
+        super().__init__(**kwargs)
+
     def effective_amount(self) -> Decimal:
         """Lo que realmente me cuesta a mí (descontando lo que pagan otros)."""
         return self.my_share if self.my_share is not None else self.amount

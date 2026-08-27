@@ -62,14 +62,14 @@
       <div class="s">{% if r.income_expected > 0 %}{{ r.income_expected | money }} por recibir{% else %}todo recibido{% endif %}</div>
     </div>
     <div class="card tile">
-      <div class="k">Gasto real</div>
-      <div class="v">{{ r.real_expenses | money }}</div>
-      <div class="s">sin la parte de otros</div>
+      <div class="k">Sale este mes</div>
+      <div class="v">{{ r.cash_out | money }}</div>
+      <div class="s">fijos + tarjetas + efectivo</div>
     </div>
     <div class="card tile">
-      <div class="k">Fijos pendientes</div>
-      <div class="v">{{ r.fixed_pending | money }}</div>
-      <div class="s">{{ r.fixed_paid | money }} ya pagados</div>
+      <div class="k">Comprado este mes</div>
+      <div class="v">{{ r.purchased | money }}</div>
+      <div class="s">incluye diferidos completos</div>
     </div>
     <div class="card tile">
       <div class="k">Te deben</div>
@@ -185,7 +185,9 @@
             </div>
             <div class="cc-meta">
               <span>Compras del {{ c.window[0].strftime('%d/%m') }} al {{ c.window[1].strftime('%d/%m') }}</span>
-              {% if c.overdue %}
+              {% if c.to_pay <= 0 %}
+                <span>Sin saldo por pagar</span>
+              {% elif c.overdue %}
                 <span class="crit">Venció el {{ c.due.strftime('%d/%m') }}</span>
               {% elif c.days_left == 0 %}
                 <span class="warn">Vence hoy</span>
@@ -242,6 +244,37 @@
         <p class="empty">Sin tarjetas registradas. Usa <code>/setup</code> en el bot.</p>
         {% endif %}
       </section>
+
+      <!-- ---------------------------------------------------- diferidos -->
+      {% if deferred %}
+      <section class="card">
+        <h2>Compras a cuotas</h2>
+        <div class="list">
+          {% for d in deferred %}
+          <div class="cc">
+            <div class="cc-head">
+              <span class="n">{{ d.label[:26] }}</span>
+              <span class="a">{{ d.remaining | money }}</span>
+            </div>
+            <div class="cc-meta">
+              <span>{{ d.card }}</span>
+              <span>{{ d.installment | money }} al mes</span>
+              <span>pagadas {{ d.paid }} de {{ d.count }}</span>
+            </div>
+            <div class="cupo" role="img"
+                 aria-label="Pagadas {{ d.paid }} de {{ d.count }} cuotas">
+              <i style="width: {{ '%.1f' % ([d.pct, 100] | min) }}%"></i>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <p class="cc-meta hoy">
+          <span>Te falta pagar
+            {{ deferred | sum(attribute='remaining') | money }} en cuotas,
+            {{ deferred | sum(attribute='installment') | money }} cada mes.</span>
+        </p>
+      </section>
+      {% endif %}
 
       <!-- ------------------------------------------------------ colchón -->
       {% if buffer.total > 0 %}

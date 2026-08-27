@@ -270,3 +270,74 @@ async def card_balance(session: AsyncSession, account: Account) -> Decimal:
         )
     ).scalars().all()
     return D(total(charges) - total(payments))
+
+
+@dataclass
+class DeferredPurchase:
+    """Una compra diferida y cuánto falta por pagar de ella."""
+
+    transaction: Transaction
+    account: Account
+    total: Decimal
+    installment: Decimal
+    count: int
+    paid: int
+    remaining_amount: Decimal
+    next_period: str | None
+
+    @property
+    def remaining(self) -> int:
+        return self.count - self.paid
+
+    @property
+    def paid_amount(self) -> Decimal:
+        return D(self.total - self.remaining_amount)
+
+
+async def deferred_purchases(
+    session: AsyncSession, period: str | None = None
+) -> list[DeferredPurchase]:
+    """Compras a cuotas con saldo pendiente, de la que menos falta a la que más.
+
+    Una cuota cuenta como pagada cuando su corte ya cerró (su período es
+    anterior o igual al mes en curso).
+    """
+    from sqlalchemy.orm import selectinload
+
+    period = period or period_of(today())
+    rows = (
+        await session.execute(
+            select(Installment)
+            .options(
+                selectinload(Installment.transaction),
+                selectinload(Installment.account),
+            )
+            .where(Installment.count > 1)
+            .order_by(Installment.transaction_id, Installment.number)
+        )
+    ).scalars().all()
+
+    grouped: dict[int, list[Installment]] = {}
+    for inst in rows:
+        grouped.setdefault(inst.transaction_id, []).append(inst)
+
+    out: list[DeferredPurchase] = []
+    for cuotas in grouped.values():
+        pendientes = [i for i in cuotas if i.statement_period > period]
+        if not pendientes:
+            continue
+        first = cuotas[0]
+        out.append(
+            DeferredPurchase(
+                transaction=first.transaction,
+                account=first.account,
+                total=total(i.amount for i in cuotas),
+                installment=D(first.amount),
+                count=first.count,
+                paid=first.count - len(pendientes),
+                remaining_amount=total(i.amount for i in pendientes),
+                next_period=pendientes[0].statement_period,
+            )
+        )
+    out.sort(key=lambda d: d.remaining)
+    return out
