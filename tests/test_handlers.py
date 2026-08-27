@@ -203,3 +203,79 @@ async def test_corte_avisa_cuando_la_tarjeta_no_tiene_fechas(session):
     await cards_h.cmd_cuts(m, session)
     assert "Sin fechas configuradas" in m.sent[0]
     assert "None" not in m.sent[0]
+
+
+# --- guardar un borrador: el camino que recorre cada gasto -----------------
+
+
+async def test_guardar_un_gasto_sin_dividir(session):
+    """El caso más común: sin división, sin tarjeta, sin cuotas."""
+    from sqlalchemy import select
+
+    from app.bot.handlers import drafts as drafts_h
+    from app.models import Transaction
+    from app.services.capture import build_context, draft_from_parsed, save_draft
+    from app.services.fallback import parse_text_rules
+
+    ctx = await build_context(session)
+    payload = await draft_from_parsed(
+        session, parse_text_rules("almuerzo 12.50", ctx), source="text"
+    )
+    draft = await save_draft(session, 1, 1, payload)
+
+    m = FakeMessage()
+    await drafts_h.cb_save(FakeCallback(f"d:save:{draft.id}", m), session)
+
+    guardado = (await session.execute(select(Transaction))).scalar_one()
+    assert guardado.amount == D("12.50")
+    assert "Guardado" in m.sent[-1]
+
+
+async def test_guardar_un_gasto_con_tarjeta_informa_el_corte(poblado):
+    from sqlalchemy import select
+
+    from app.bot.handlers import drafts as drafts_h
+    from app.models import Account, Installment
+    from app.services.capture import build_context, draft_from_parsed, save_draft
+    from app.services.fallback import parse_text_rules
+
+    visa = (
+        await poblado.execute(select(Account).where(Account.name == "Visa"))
+    ).scalar_one()
+    ctx = await build_context(poblado)
+    payload = await draft_from_parsed(
+        poblado, parse_text_rules("gasolina 25 con la visa", ctx), source="text"
+    )
+    payload["account_id"] = visa.id
+    draft = await save_draft(poblado, 1, 1, payload)
+
+    m = FakeMessage()
+    await drafts_h.cb_save(FakeCallback(f"d:save:{draft.id}", m), poblado)
+
+    assert "corte" in m.sent[-1]
+    assert (await poblado.execute(select(Installment))).scalars().all()
+
+
+async def test_guardar_un_gasto_dividido_lista_a_cada_quien(session):
+    from sqlalchemy import select
+
+    from app.bot.handlers import drafts as drafts_h
+    from app.models import Person
+    from app.services.capture import build_context, draft_from_parsed, save_draft
+    from app.services.fallback import parse_text_rules
+
+    ctx = await build_context(session)
+    payload = await draft_from_parsed(
+        session, parse_text_rules("cena 96 con Ana y Luis", ctx), source="text"
+    )
+    draft = await save_draft(session, 1, 1, payload)
+
+    m = FakeMessage()
+    await drafts_h.cb_save(FakeCallback(f"d:save:{draft.id}", m), session)
+
+    texto = m.sent[-1]
+    assert "Te toca" in texto
+    nombres = {p.name for p in (await session.execute(select(Person))).scalars().all()}
+    assert nombres == {"Ana", "Luis"}
+    for nombre in nombres:
+        assert nombre in texto

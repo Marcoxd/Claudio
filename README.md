@@ -188,6 +188,18 @@ uvicorn app.main:app --reload
 clave de Gemini responda y que la base esté accesible. Cuando algo no arranque,
 empieza por ahí.
 
+¿Quieres probarlo sin Telegram? `scripts/simular.py` levanta el bot completo
+—los mismos routers, middlewares y estados— con una sesión de Telegram
+simulada, y conversas por la terminal:
+
+```bash
+PYTHONPATH=. python scripts/simular.py            # conversación
+PYTHONPATH=. python scripts/simular.py --guion    # una demo de corrido
+```
+
+Escribes como en el chat; «1», «2»… pulsan los botones. Sirve para probar
+cambios sin tocar tu bot de verdad, y para enseñárselo a alguien.
+
 ¿Quieres verlo con datos de ejemplo antes de configurar nada?
 
 ```bash
