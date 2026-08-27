@@ -58,10 +58,11 @@ class Settings(BaseSettings):
             v = "postgresql+asyncpg://" + v[len("postgresql://") :]
         elif v.startswith("sqlite:///"):
             v = "sqlite+aiosqlite:///" + v[len("sqlite:///") :]
-        # asyncpg no entiende ?sslmode=..., usa ssl=...
-        if "+asyncpg" in v and "sslmode=" in v:
+        # asyncpg no entiende ?sslmode=... ni ?channel_binding=...
+        if "+asyncpg" in v and ("sslmode=" in v or "channel_binding=" in v):
             base, _, query = v.partition("?")
-            keep = [p for p in query.split("&") if not p.startswith("sslmode=")]
+            drop = {"sslmode", "channel_binding"}
+            keep = [p for p in query.split("&") if p.split("=")[0] not in drop]
             v = base + ("?" + "&".join(keep) if keep else "")
         return v
 
