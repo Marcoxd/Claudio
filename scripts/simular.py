@@ -91,7 +91,7 @@ class SesionFalsa:
                 chat=Chat(id=USUARIO, type="private"),
                 from_user=User(id=1, is_bot=True, first_name="Bot"),
                 text=_limpiar(texto)[:4000],
-            )
+            ).as_(bot)   # sin enlazar al bot, .edit_text() y .delete() fallan
             self.mensajes[self.contador] = mensaje
             return mensaje
 
@@ -153,6 +153,8 @@ async def _tocar(dp, bot, sesion, indice: int) -> None:
     print(f"{AZUL}› [{boton.text}]{FIN}")
     sesion.contador += 1
     mensaje = list(sesion.mensajes.values())[-1] if sesion.mensajes else None
+    if mensaje is not None:
+        mensaje = mensaje.as_(bot)
     actualizacion = Update(
         update_id=sesion.contador,
         callback_query=CallbackQuery(
