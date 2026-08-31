@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>{{ app_name }} · {{ period_label }}</title>
-<link rel="stylesheet" href="/static/style.css?v=20">
+<link rel="stylesheet" href="/static/style.css?v=22">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='13' fill='%23c25a3e'/></svg>">
 <script>
   (function() {
@@ -26,6 +26,7 @@
     </div>
     <div class="top-actions">
       <button id="btn-open-modal" class="btn-action" type="button" title="Registrar nuevo gasto, ingreso, tarjeta o fijo">＋ Registrar</button>
+      <button id="btn-open-export" class="btn-action btn-action-sec" type="button" title="Exportar a Excel o CSV">📥 Exportar</button>
       <nav class="monthnav">
         <a href="/?period={{ prev_period }}" title="Mes anterior">←</a>
         <label class="month-pick">
@@ -384,12 +385,20 @@
     {% endif %}
   </section>
 
-  <!-- -------------------------------------------------------- exportar -->
-  <section class="card">
-    <h2>Exportar a Excel / CSV</h2>
+  <p class="foot">{{ app_name }} · <a href="/salir">cerrar sesión</a></p>
+</div>
+
+<!-- ------------------------------------------------------ modal exportar -->
+<div id="modal-export" class="modal-backdrop" style="display: none;">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Exportar a Excel / CSV</h3>
+      <button type="button" class="modal-close" id="btn-close-export" title="Cerrar (Esc)">✕</button>
+    </div>
+
     <form id="export-form" class="form" method="get" action="/exportar">
       <input type="hidden" name="t" value="{{ token }}">
-      <div class="toggle export-toggle">
+      <div class="toggle export-toggle" style="margin-bottom: 8px;">
         <input type="radio" name="tipo" value="mes" id="exp-mes" checked>
         <label for="exp-mes">Por mes</label>
         <input type="radio" name="tipo" value="dia" id="exp-dia">
@@ -397,38 +406,34 @@
         <input type="radio" name="tipo" value="ano" id="exp-ano">
         <label for="exp-ano">Por año</label>
         <input type="radio" name="tipo" value="todo" id="exp-todo">
-        <label for="exp-todo">Todo el historial</label>
+        <label for="exp-todo">Todo</label>
       </div>
 
-      <div class="row" style="align-items: flex-end; margin-top: 4px;">
-        <div id="field-mes" class="exp-field" style="width: 100%; max-width: 240px;">
-          <label>Mes
-            <input type="month" name="period" value="{{ period }}">
-          </label>
-        </div>
-
-        <div id="field-dia" class="exp-field" style="display: none; width: 100%; max-width: 240px;">
-          <label>Fecha
-            <input type="date" name="date" value="{{ today_iso }}">
-          </label>
-        </div>
-
-        <div id="field-ano" class="exp-field" style="display: none; width: 100%; max-width: 240px;">
-          <label>Año
-            <input type="number" name="year" value="{{ current_year }}" min="2020" max="2099">
-          </label>
-        </div>
-
-        <div id="field-todo" class="exp-field" style="display: none; width: 100%;">
-          <span style="font-size: 13px; color: var(--ink-3); line-height: 2.2;">Se descargará todo el historial registrado en formato compatible con Excel (.csv UTF-8).</span>
-        </div>
-
-        <button class="btn" type="submit" style="margin-bottom: 2px;">Descargar Excel (.csv)</button>
+      <div id="field-mes" class="exp-field" style="width: 100%;">
+        <label>Seleccionar Mes
+          <input type="month" name="period" value="{{ period }}">
+        </label>
       </div>
+
+      <div id="field-dia" class="exp-field" style="display: none; width: 100%;">
+        <label>Seleccionar Fecha
+          <input type="date" name="date" value="{{ today_iso }}">
+        </label>
+      </div>
+
+      <div id="field-ano" class="exp-field" style="display: none; width: 100%;">
+        <label>Seleccionar Año
+          <input type="number" name="year" value="{{ current_year }}" min="2020" max="2099">
+        </label>
+      </div>
+
+      <div id="field-todo" class="exp-field" style="display: none; width: 100%;">
+        <p style="font-size: 13px; color: var(--ink-3); margin: 6px 0 0;">Se descargará todo el historial registrado en formato compatible con Excel (.csv con punto y coma).</p>
+      </div>
+
+      <button class="btn" type="submit" style="margin-top: 10px; width: 100%; text-align: center; justify-content: center;">Descargar Excel (.csv)</button>
     </form>
-  </section>
-
-  <p class="foot">{{ app_name }} · <a href="/salir">cerrar sesión</a></p>
+  </div>
 </div>
 
 <!-- ------------------------------------------------------------- modal -->
@@ -609,23 +614,52 @@ if (monthWrap && mp) {
   });
 }
 
-// ---- export toggle
+// ---- modal de exportar a excel
 (function () {
+  var modal = document.getElementById('modal-export');
+  var btnOpen = document.getElementById('btn-open-export');
+  var btnClose = document.getElementById('btn-close-export');
   var expForm = document.getElementById('export-form');
-  if (!expForm) return;
-  var fMes = document.getElementById('field-mes');
-  var fDia = document.getElementById('field-dia');
-  var fAno = document.getElementById('field-ano');
-  var fTodo = document.getElementById('field-todo');
+  if (!modal) return;
 
-  expForm.querySelectorAll('input[name="tipo"]').forEach(function (r) {
-    r.addEventListener('change', function () {
-      fMes.style.display = r.value === 'mes' ? 'block' : 'none';
-      fDia.style.display = r.value === 'dia' ? 'block' : 'none';
-      fAno.style.display = r.value === 'ano' ? 'block' : 'none';
-      fTodo.style.display = r.value === 'todo' ? 'block' : 'none';
-    });
+  window.openExportModal = function () {
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.closeExportModal = function () {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+  };
+
+  if (btnOpen) btnOpen.addEventListener('click', window.openExportModal);
+  if (btnClose) btnClose.addEventListener('click', window.closeExportModal);
+
+  modal.addEventListener('click', function (e) {
+    if (e.target === modal) window.closeExportModal();
   });
+
+  window.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && modal.style.display !== 'none') {
+      window.closeExportModal();
+    }
+  });
+
+  if (expForm) {
+    var fMes = document.getElementById('field-mes');
+    var fDia = document.getElementById('field-dia');
+    var fAno = document.getElementById('field-ano');
+    var fTodo = document.getElementById('field-todo');
+
+    expForm.querySelectorAll('input[name="tipo"]').forEach(function (r) {
+      r.addEventListener('change', function () {
+        fMes.style.display = r.value === 'mes' ? 'block' : 'none';
+        fDia.style.display = r.value === 'dia' ? 'block' : 'none';
+        fAno.style.display = r.value === 'ano' ? 'block' : 'none';
+        fTodo.style.display = r.value === 'todo' ? 'block' : 'none';
+      });
+    });
+  }
 })();
 
 // ---- theme switcher (claro / oscuro)

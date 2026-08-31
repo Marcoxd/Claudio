@@ -172,6 +172,15 @@ a:hover { text-decoration-color: var(--ink-3); }
   filter: brightness(1.08);
   transform: scale(1.02);
 }
+.btn-action-sec {
+  background: var(--tint);
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+.btn-action-sec:hover {
+  background: var(--card);
+  border-color: var(--ink-3);
+}
 .theme-btn {
   background: var(--tint);
   border: 1px solid var(--line);
