@@ -1,7 +1,9 @@
 """Dashboard web y API de solo lectura."""
 from __future__ import annotations
 
+import csv
 import datetime as dt
+import io
 import secrets
 from pathlib import Path
 
@@ -183,6 +185,7 @@ async def dashboard(
         "chart": _line_chart(flow),
         "token": token,
         "today_iso": today().isoformat(),
+        "current_year": today().year,
         "all_categories": categories_all,
         "all_accounts": accounts_all,
     }
@@ -369,6 +372,88 @@ async def delete_transaction(
         await session.delete(tx)
         await session.flush()
     return _redirect_to(period, token)
+
+
+@router.get("/exportar")
+async def export_transactions(
+    tipo: str = Query(default="mes"),
+    period: str | None = Query(default=None),
+    date: str | None = Query(default=None),
+    year: int | None = Query(default=None),
+    token: str = Depends(check_token),
+    session: AsyncSession = Depends(get_session),
+) -> Response:
+    stmt = select(Transaction).order_by(Transaction.date.asc(), Transaction.id.asc())
+
+    if tipo in ("dia", "day", "date") and date:
+        try:
+            d = dt.date.fromisoformat(date)
+            stmt = stmt.where(Transaction.date == d)
+            filename = f"movimientos_{date}.csv"
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Formato de fecha inválido")
+    elif tipo in ("ano", "año", "year") and year:
+        start_d = dt.date(year, 1, 1)
+        end_d = dt.date(year, 12, 31)
+        stmt = stmt.where(Transaction.date >= start_d, Transaction.date <= end_d)
+        filename = f"movimientos_{year}.csv"
+    elif tipo in ("todo", "all"):
+        filename = f"movimientos_todo_{today().isoformat()}.csv"
+    else:  # mes
+        p = period or current_period()
+        stmt = stmt.where(Transaction.period == p)
+        filename = f"movimientos_{p}.csv"
+
+    rows = (await session.execute(stmt)).scalars().all()
+
+    output = io.StringIO()
+    output.write("\ufeff")  # BOM UTF-8 para compatibilidad nativa con Excel
+    writer = csv.writer(output, delimiter=",", quoting=csv.QUOTE_MINIMAL)
+
+    writer.writerow([
+        "ID",
+        "Fecha",
+        "Tipo",
+        "Descripción",
+        "Monto Total ($)",
+        "Mi Parte ($)",
+        "Categoría",
+        "Medio de Pago",
+        "Cuotas",
+        "Comercio",
+        "Período",
+        "Notas",
+    ])
+
+    for t in rows:
+        tipo_str = "Gasto" if t.kind == KIND_EXPENSE else "Ingreso"
+        cat_str = t.category.name if t.category else ""
+        acc_str = t.account.name if t.account else ""
+        mi_parte = float(t.my_share) if t.my_share is not None else float(t.amount)
+        writer.writerow([
+            t.id,
+            t.date.isoformat(),
+            tipo_str,
+            t.description,
+            f"{float(t.amount):.2f}",
+            f"{mi_parte:.2f}",
+            cat_str,
+            acc_str,
+            t.installments_total,
+            t.merchant or "",
+            t.period,
+            t.notes or "",
+        ])
+
+    csv_bytes = output.getvalue().encode("utf-8-sig")
+    return Response(
+        content=csv_bytes,
+        media_type="text/csv; charset=utf-8",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"',
+            "Cache-Control": "no-cache",
+        },
+    )
 
 
 @router.get("/salir")

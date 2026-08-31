@@ -1,33 +1,32 @@
 /* ==========================================================================
    Panel — hoja de estilos única, sin dependencias externas.
 
-   Paleta: pasteles cálidos en superficies; versiones apagadas de esos mismos
-   tonos en los datos (los pasteles puros no alcanzan contraste ni separación
-   para daltonismo). Verificada en claro y oscuro.
+   Paleta: neutros limpios con acento clay. Modo claro luminoso,
+   modo oscuro con fondo casi negro y buen contraste.
    ========================================================================== */
 
 :root {
   color-scheme: light;
 
-  --paper:     #f2ece4;   /* arena cálida, no blanco */
-  --card:      #fbf7f2;   /* crema */
-  --tint:      #eae1d5;
-  --line:      #e0d5c7;
-  --line-soft: #ece3d8;
+  --paper:     #f7f7f8;   /* gris muy claro */
+  --card:      #ffffff;
+  --tint:      #ededf0;
+  --line:      #d8d8dc;
+  --line-soft: #e8e8ec;
 
-  --ink:   #2e2721;   /* café muy oscuro, no negro */
-  --ink-2: #5c5348;
-  --ink-3: #75695b;
+  --ink:   #1a1a1a;
+  --ink-2: #5c5c66;
+  --ink-3: #8a8a94;
 
   --clay:       #c25a3e;
-  --clay-soft:  #f6e6de;
-  --blue:       #5470c0;
-  --blue-soft:  #e7e9f4;
-  --green:      #12896c;
-  --green-soft: #dfeee7;
+  --clay-soft:  #fceee9;
+  --blue:       #3b6cdb;
+  --blue-soft:  #e8eefb;
+  --green:      #1a8a5f;
+  --green-soft: #e4f4ed;
 
-  --warn: #8f6212;
-  --crit: #b4453f;
+  --warn: #b07d15;
+  --crit: #c44040;
 
   --radius: 12px;
   --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -36,43 +35,43 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --paper:     #241c21;   /* ciruela oscuro, no negro */
-    --card:      #31272d;
-    --tint:      #3e3239;
-    --line:      #473a42;
-    --line-soft: #392f36;
-    --ink:   #f4ebe6;
-    --ink-2: #bcb0a9;
-    --ink-3: #a1958e;
-    --clay:       #d4715a;
-    --clay-soft:  #3a2a28;
-    --blue:       #7089d4;
-    --blue-soft:  #2b2b3d;
-    --green:      #2aa07f;
-    --green-soft: #21332e;
-    --warn: #d9a441;
-    --crit: #e8837c;
+    --paper:     #0a0a0a;
+    --card:      #161616;
+    --tint:      #222222;
+    --line:      #2e2e2e;
+    --line-soft: #1f1f1f;
+    --ink:   #ebebeb;
+    --ink-2: #9a9a9a;
+    --ink-3: #6e6e6e;
+    --clay:       #e07458;
+    --clay-soft:  #2a1a16;
+    --blue:       #6b96f0;
+    --blue-soft:  #1a2030;
+    --green:      #3db882;
+    --green-soft: #142820;
+    --warn: #e0a830;
+    --crit: #f07070;
   }
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --paper:     #241c21;   /* ciruela oscuro, no negro */
-  --card:      #31272d;
-  --tint:      #3e3239;
-  --line:      #473a42;
-  --line-soft: #392f36;
-  --ink:   #f4ebe6;
-  --ink-2: #bcb0a9;
-  --ink-3: #a1958e;
-  --clay:       #d4715a;
-  --clay-soft:  #3a2a28;
-  --blue:       #7089d4;
-  --blue-soft:  #2b2b3d;
-  --green:      #2aa07f;
-  --green-soft: #21332e;
-  --warn: #d9a441;
-  --crit: #e8837c;
+  --paper:     #0a0a0a;
+  --card:      #161616;
+  --tint:      #222222;
+  --line:      #2e2e2e;
+  --line-soft: #1f1f1f;
+  --ink:   #ebebeb;
+  --ink-2: #9a9a9a;
+  --ink-3: #6e6e6e;
+  --clay:       #e07458;
+  --clay-soft:  #2a1a16;
+  --blue:       #6b96f0;
+  --blue-soft:  #1a2030;
+  --green:      #3db882;
+  --green-soft: #142820;
+  --warn: #e0a830;
+  --crit: #f07070;
 }
 
 * { box-sizing: border-box; }
@@ -113,6 +112,15 @@ a:hover { text-decoration-color: var(--ink-3); }
 }
 .monthnav .current { color: var(--ink); font-weight: 500; }
 .monthnav a:hover { background: var(--tint); color: var(--ink); }
+
+.month-pick {
+  position: relative; cursor: pointer; display: inline-block;
+}
+.month-input {
+  position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%;
+  cursor: pointer; font-size: 0; border: none; padding: 0;
+  color-scheme: dark;
+}
 
 /* -------------------------------------------------------------------- hero */
 
@@ -286,11 +294,19 @@ td.num { font-variant-numeric: tabular-nums; color: var(--ink); }
 
 .addbox { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line-soft); }
 .addbox summary {
-  cursor: pointer; font-size: 13px; color: var(--ink-3); list-style: none;
+  cursor: pointer; font-size: 13px; color: var(--clay); font-weight: 500;
+  list-style: none; display: inline-block;
+  padding: 7px 16px; border-radius: 8px;
+  border: 1px dashed var(--clay); background: var(--clay-soft);
+  transition: background .15s, border-color .15s;
+}
+.addbox summary:hover {
+  background: var(--clay); color: var(--card); border-style: solid;
 }
 .addbox summary::-webkit-details-marker { display: none; }
 .addbox summary::before { content: "+ "; }
 .addbox[open] summary::before { content: "− "; }
+.addbox[open] summary { border-style: solid; }
 .addbox .body { margin-top: 16px; }
 
 .form { display: flex; flex-direction: column; gap: 12px; }
@@ -308,8 +324,19 @@ td.num { font-variant-numeric: tabular-nums; color: var(--ink); }
 .form input[type="date"] { color-scheme: light; }
 :root:not([data-theme="light"]) .form input[type="date"] { color-scheme: dark; }
 :root[data-theme="dark"] .form input[type="date"] { color-scheme: dark; }
-.form .kind { flex-direction: row; gap: 16px; align-items: center; font-size: 14px; color: var(--ink); }
-.form .kind label { flex-direction: row; gap: 6px; font-size: 14px; color: var(--ink); }
+.toggle {
+  display: inline-flex; border-radius: 8px; overflow: hidden;
+  border: 1px solid var(--line); background: var(--tint);
+}
+.toggle input { position: absolute; opacity: 0; pointer-events: none; }
+.toggle label {
+  padding: 8px 20px; font-size: 13.5px; font-weight: 500;
+  color: var(--ink-3); cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.toggle input:checked + label {
+  background: var(--clay); color: #fff;
+}
 
 .btn {
   align-self: flex-start; font: inherit; font-size: 13.5px; font-weight: 500;
