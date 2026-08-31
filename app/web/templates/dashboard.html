@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>{{ app_name }} · {{ period_label }}</title>
-<link rel="stylesheet" href="/static/style.css?v=8">
+<link rel="stylesheet" href="/static/style.css?v=9">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='13' fill='%23c25a3e'/></svg>">
 <script>
   (function() {
@@ -564,8 +564,16 @@
 })();
 
 // ---- month picker: clic en el mes abre el calendario nativo
+var monthWrap = document.querySelector('.month-pick');
 var mp = document.querySelector('.month-input');
-if (mp) {
+if (monthWrap && mp) {
+  monthWrap.addEventListener('click', function () {
+    try {
+      if (typeof mp.showPicker === 'function') {
+        mp.showPicker();
+      }
+    } catch (err) {}
+  });
   mp.addEventListener('change', function () {
     if (mp.value) window.location.href = '/?period=' + mp.value;
   });
