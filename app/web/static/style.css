@@ -423,24 +423,27 @@ td.num { font-variant-numeric: tabular-nums; color: var(--ink); }
 .empty { color: var(--ink-3); font-size: 14px; margin: 0; }
 .foot { margin-top: 48px; color: var(--ink-3); font-size: 12.5px; }
 
-/* ------------------------------------------------------------- agregar */
-
-.addbox { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line-soft); }
-.addbox summary {
-  cursor: pointer; font-size: 13px; color: var(--clay); font-weight: 500;
-  list-style: none; display: inline-block;
-  padding: 7px 16px; border-radius: 8px;
-  border: 1px dashed var(--clay); background: var(--clay-soft);
-  transition: background .15s, border-color .15s;
+.btn-add-section {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--tint);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 7px 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+  transition: all .15s ease;
 }
-.addbox summary:hover {
-  background: var(--clay); color: var(--card); border-style: solid;
+.btn-add-section:hover {
+  background: var(--card);
+  border-color: var(--ink-3);
+  transform: translateY(-1px);
 }
-.addbox summary::-webkit-details-marker { display: none; }
-.addbox summary::before { content: "+ "; }
-.addbox[open] summary::before { content: "− "; }
-.addbox[open] summary { border-style: solid; }
-.addbox .body { margin-top: 16px; }
 
 .form { display: flex; flex-direction: column; gap: 12px; }
 .form .row { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }

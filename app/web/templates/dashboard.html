@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>{{ app_name }} · {{ period_label }}</title>
-<link rel="stylesheet" href="/static/style.css?v=11">
+<link rel="stylesheet" href="/static/style.css?v=13">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='13' fill='%23c25a3e'/></svg>">
 <script>
   (function() {
@@ -185,42 +185,7 @@
         <p class="empty">Sin gastos fijos configurados.</p>
         {% endif %}
 
-        <details class="addbox">
-          <summary>Nuevo gasto fijo</summary>
-          <div class="body">
-            <form class="form" method="post" action="/fijos/nuevo?t={{ token }}">
-              <input type="hidden" name="period" value="{{ period }}">
-              <label>Nombre
-                <input type="text" name="name" placeholder="Arriendo" required maxlength="96">
-              </label>
-              <div class="row">
-                <label>Monto mensual
-                  <input type="number" name="amount" min="0" step="0.01" required placeholder="$">
-                </label>
-                <label>Día del mes
-                  <input type="number" name="due_day" min="1" max="31" required>
-                </label>
-                <label>Categoría
-                  <select name="category_id">
-                    <option value="">— sin categoría —</option>
-                    {% for c in all_categories %}
-                    <option value="{{ c.id }}">{{ c.label() }}</option>
-                    {% endfor %}
-                  </select>
-                </label>
-                <label>Medio de pago
-                  <select name="account_id">
-                    <option value="">— sin definir —</option>
-                    {% for a in all_accounts %}
-                    <option value="{{ a.id }}">{{ a.name }}</option>
-                    {% endfor %}
-                  </select>
-                </label>
-              </div>
-              <button class="btn" type="submit">Crear gasto fijo</button>
-            </form>
-          </div>
-        </details>
+        <button type="button" class="btn-add-section" onclick="openAddModal('fijo')">＋ Nuevo gasto fijo</button>
       </section>
     </div>
 
@@ -296,29 +261,7 @@
         <p class="empty">Sin tarjetas registradas. Usa <code>/setup</code> en el bot.</p>
         {% endif %}
 
-        <details class="addbox">
-          <summary>Nueva tarjeta</summary>
-          <div class="body">
-            <form class="form" method="post" action="/tarjetas/nueva?t={{ token }}">
-              <input type="hidden" name="period" value="{{ period }}">
-              <label>Nombre
-                <input type="text" name="name" placeholder="Visa Pichincha" required maxlength="64">
-              </label>
-              <div class="row">
-                <label>Día de corte
-                  <input type="number" name="cut_day" min="1" max="31" required>
-                </label>
-                <label>Día de pago
-                  <input type="number" name="due_day" min="1" max="31" required>
-                </label>
-                <label>Cupo (opcional)
-                  <input type="number" name="credit_limit" min="0" step="0.01" placeholder="$">
-                </label>
-              </div>
-              <button class="btn" type="submit">Crear tarjeta</button>
-            </form>
-          </div>
-        </details>
+        <button type="button" class="btn-add-section" onclick="openAddModal('tarjeta')">＋ Nueva tarjeta</button>
       </section>
 
       <!-- ---------------------------------------------------- diferidos -->
@@ -396,7 +339,10 @@
 
   <!-- --------------------------------------------------- movimientos -->
   <section class="card">
-    <h2>Últimos movimientos</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+      <h2 style="margin: 0;">Últimos movimientos</h2>
+      <button type="button" class="btn-add-section" style="margin-top: 0;" onclick="openAddModal('mov')">＋ Registrar movimiento</button>
+    </div>
     {% if recent %}
     <div class="scroll">
       <table>
