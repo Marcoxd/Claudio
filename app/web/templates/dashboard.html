@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>{{ app_name }} · {{ period_label }}</title>
-<link rel="stylesheet" href="/static/style.css?v=15">
+<link rel="stylesheet" href="/static/style.css?v=17">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='13' fill='%23c25a3e'/></svg>">
 <script>
   (function() {
@@ -185,7 +185,7 @@
         <p class="empty">Sin gastos fijos configurados.</p>
         {% endif %}
 
-        <button type="button" class="btn-add-section" onclick="openAddModal('fijo')">＋ Nuevo gasto fijo</button>
+        <button type="button" class="btn-add-section" onclick="openAddModal('fijo', false)">＋ Nuevo gasto fijo</button>
       </section>
     </div>
 
@@ -261,7 +261,7 @@
         <p class="empty">Sin tarjetas registradas. Usa <code>/setup</code> en el bot.</p>
         {% endif %}
 
-        <button type="button" class="btn-add-section" onclick="openAddModal('tarjeta')">＋ Nueva tarjeta</button>
+        <button type="button" class="btn-add-section" onclick="openAddModal('tarjeta', false)">＋ Nueva tarjeta</button>
       </section>
 
       <!-- ---------------------------------------------------- diferidos -->
@@ -341,7 +341,7 @@
   <section class="card">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
       <h2 style="margin: 0;">Últimos movimientos</h2>
-      <button type="button" class="btn-add-section" style="margin-top: 0;" onclick="openAddModal('mov')">＋ Registrar movimiento</button>
+      <button type="button" class="btn-add-section" style="margin-top: 0;" onclick="openAddModal('mov', false)">＋ Registrar movimiento</button>
     </div>
     {% if recent %}
     <div class="scroll">
@@ -440,7 +440,7 @@
     </div>
 
     <!-- Pestañas para elegir tipo de registro -->
-    <div class="toggle modal-tab-toggle" style="margin-bottom: 20px; width: 100%; display: flex;">
+    <div id="modal-tab-toggle" class="toggle modal-tab-toggle" style="margin-bottom: 20px; width: 100%; display: flex;">
       <input type="radio" name="modal_tab" value="mov" id="tab-mov" checked>
       <label for="tab-mov" style="flex: 1; text-align: center;">Movimiento</label>
       <input type="radio" name="modal_tab" value="tarjeta" id="tab-tarjeta">
@@ -652,8 +652,13 @@ if (monthWrap && mp) {
   var fTarjeta = document.getElementById('modal-form-tarjeta');
   var fFijo = document.getElementById('modal-form-fijo');
   var title = document.getElementById('modal-title');
+  var tabToggle = document.getElementById('modal-tab-toggle');
 
-  function showTab(tab) {
+  function showTab(tab, showTabs) {
+    if (tabToggle) {
+      tabToggle.style.display = (showTabs !== false) ? 'flex' : 'none';
+    }
+
     var radio = document.getElementById('tab-' + tab);
     if (radio) radio.checked = true;
 
@@ -682,8 +687,8 @@ if (monthWrap && mp) {
     }
   }
 
-  window.openAddModal = function (tab) {
-    showTab(tab || 'mov');
+  window.openAddModal = function (tab, showTabs) {
+    showTab(tab || 'mov', showTabs !== false);
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
   };
@@ -695,7 +700,7 @@ if (monthWrap && mp) {
 
   if (btnOpen) {
     btnOpen.addEventListener('click', function () {
-      window.openAddModal('mov');
+      window.openAddModal('mov', true);
     });
   }
 
