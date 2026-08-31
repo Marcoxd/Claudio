@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>{{ app_name }} · {{ period_label }}</title>
-<link rel="stylesheet" href="/static/style.css?v=24">
+<link rel="stylesheet" href="/static/style.css?v=25">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='13' fill='%23c25a3e'/></svg>">
 <script>
   (function() {
@@ -641,6 +641,8 @@ if (monthWrap && mp) {
   mp.addEventListener('change', function () {
     if (mp.value) window.location.href = '/?period=' + mp.value;
   });
+}
+
 // ---- filtro por categoría en la tabla de movimientos
 (function () {
   var filterSelect = document.getElementById('filter-category-select');
