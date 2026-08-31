@@ -1,97 +1,98 @@
 /* ==========================================================================
    Panel — hoja de estilos única, sin dependencias externas.
 
-   Paleta: neutros limpios con acento clay. Modo claro luminoso,
-   modo oscuro con fondo casi negro y buen contraste.
+   Paleta: Monocromo Titanium (Apple / Obsidian style).
+   Modo oscuro en gris titanio profundo con texto blanco nítido.
+   Modo claro en gris perla con tarjetas blancas y tipografía carbón.
    ========================================================================== */
 
 :root {
   color-scheme: light;
 
-  --paper:     #f7f7f8;   /* gris muy claro */
-  --card:      #ffffff;
-  --tint:      #ededf0;
-  --line:      #d8d8dc;
-  --line-soft: #e8e8ec;
+  --paper:     #f4f4f6;   /* gris perla neutro */
+  --card:      #ffffff;   /* blanco puro */
+  --tint:      #e4e4e7;   /* zinc suave */
+  --line:      #e2e2e8;   /* bordes nítidos */
+  --line-soft: #ededf2;
 
-  --ink:   #1a1a1a;
-  --ink-2: #5c5c66;
-  --ink-3: #8a8a94;
+  --ink:   #09090b;   /* negro carbón profundo */
+  --ink-2: #52525b;   /* zinc 600 */
+  --ink-3: #71717a;   /* zinc 500 */
 
-  --clay:       #c25a3e;
-  --clay-soft:  #fceee9;
-  --blue:       #3b6cdb;
-  --blue-soft:  #e8eefb;
-  --green:      #1a8a5f;
-  --green-soft: #e4f4ed;
+  --clay:       #18181b;   /* botón de alto contraste */
+  --clay-soft:  #f4f4f5;
+  --blue:       #2563eb;   /* zafiro */
+  --blue-soft:  #eff6ff;
+  --green:      #10b981;   /* esmeralda */
+  --green-soft: #ecfdf5;
 
-  --warn: #b07d15;
-  --crit: #c44040;
+  --warn: #f59e0b;   /* ámbar */
+  --crit: #ef4444;   /* carmesí */
 
   --radius: 12px;
-  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 :root[data-theme="light"] {
   color-scheme: light;
-  --paper:     #f7f7f8;
+  --paper:     #f4f4f6;
   --card:      #ffffff;
-  --tint:      #ededf0;
-  --line:      #d8d8dc;
-  --line-soft: #e8e8ec;
-  --ink:   #1a1a1a;
-  --ink-2: #5c5c66;
-  --ink-3: #8a8a94;
-  --clay:       #c25a3e;
-  --clay-soft:  #fceee9;
-  --blue:       #3b6cdb;
-  --blue-soft:  #e8eefb;
-  --green:      #1a8a5f;
-  --green-soft: #e4f4ed;
-  --warn: #b07d15;
-  --crit: #c44040;
+  --tint:      #e4e4e7;
+  --line:      #e2e2e8;
+  --line-soft: #ededf2;
+  --ink:   #09090b;
+  --ink-2: #52525b;
+  --ink-3: #71717a;
+  --clay:       #18181b;
+  --clay-soft:  #f4f4f5;
+  --blue:       #2563eb;
+  --blue-soft:  #eff6ff;
+  --green:      #10b981;
+  --green-soft: #ecfdf5;
+  --warn: #f59e0b;
+  --crit: #ef4444;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --paper:     #0a0a0a;
-    --card:      #161616;
-    --tint:      #222222;
-    --line:      #2e2e2e;
-    --line-soft: #1f1f1f;
-    --ink:   #ebebeb;
-    --ink-2: #9a9a9a;
-    --ink-3: #6e6e6e;
-    --clay:       #e07458;
-    --clay-soft:  #2a1a16;
-    --blue:       #6b96f0;
-    --blue-soft:  #1a2030;
-    --green:      #3db882;
-    --green-soft: #142820;
-    --warn: #e0a830;
-    --crit: #f07070;
+    --paper:     #111113;   /* titanio oscuro */
+    --card:      #1a1a1e;   /* tarjeta titanio */
+    --tint:      #26262c;
+    --line:      #32323a;
+    --line-soft: #222228;
+    --ink:   #f4f4f6;   /* blanco titanio */
+    --ink-2: #a1a1aa;
+    --ink-3: #71717a;
+    --clay:       #f4f4f6;
+    --clay-soft:  #27272e;
+    --blue:       #3b82f6;
+    --blue-soft:  #1e293b;
+    --green:      #10b981;
+    --green-soft: #064e3b;
+    --warn: #f59e0b;
+    --crit: #ef4444;
   }
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --paper:     #0a0a0a;
-  --card:      #161616;
-  --tint:      #222222;
-  --line:      #2e2e2e;
-  --line-soft: #1f1f1f;
-  --ink:   #ebebeb;
-  --ink-2: #9a9a9a;
-  --ink-3: #6e6e6e;
-  --clay:       #e07458;
-  --clay-soft:  #2a1a16;
-  --blue:       #6b96f0;
-  --blue-soft:  #1a2030;
-  --green:      #3db882;
-  --green-soft: #142820;
-  --warn: #e0a830;
-  --crit: #f07070;
+  --paper:     #111113;
+  --card:      #1a1a1e;
+  --tint:      #26262c;
+  --line:      #32323a;
+  --line-soft: #222228;
+  --ink:   #f4f4f6;
+  --ink-2: #a1a1aa;
+  --ink-3: #71717a;
+  --clay:       #f4f4f6;
+  --clay-soft:  #27272e;
+  --blue:       #3b82f6;
+  --blue-soft:  #1e293b;
+  --green:      #10b981;
+  --green-soft: #064e3b;
+  --warn: #f59e0b;
+  --crit: #ef4444;
 }
 
 * { box-sizing: border-box; }
@@ -152,8 +153,8 @@ a:hover { text-decoration-color: var(--ink-3); }
   font: inherit;
   font-size: 13px;
   font-weight: 500;
-  color: #fff;
-  background: var(--clay);
+  color: var(--paper);
+  background: var(--ink);
   border: none;
   border-radius: 8px;
   padding: 6px 14px;
@@ -467,15 +468,15 @@ td.num { font-variant-numeric: tabular-nums; color: var(--ink); }
   transition: background .15s, color .15s;
 }
 .toggle input:checked + label {
-  background: var(--clay); color: #fff;
+  background: var(--ink); color: var(--paper);
 }
 
 .btn {
   align-self: flex-start; font: inherit; font-size: 13.5px; font-weight: 500;
-  color: var(--card); background: var(--clay); border: none;
+  color: var(--paper); background: var(--ink); border: none;
   border-radius: 8px; padding: 9px 18px; cursor: pointer;
 }
-.btn:hover { filter: brightness(1.06); }
+.btn:hover { filter: brightness(1.15); }
 
 .list .item form.inline, .scroll form.inline { display: inline; }
 .del {
