@@ -188,6 +188,7 @@ async def dashboard(
         "token": token,
         "today_iso": today().isoformat(),
         "current_year": today().year,
+        "app_version": settings.app_version,
         "all_categories": categories_all,
         "all_accounts": accounts_all,
     }
