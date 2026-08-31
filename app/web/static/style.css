@@ -449,6 +449,56 @@ td.num { font-variant-numeric: tabular-nums; color: var(--ink); }
   transform: translateY(-1px);
 }
 
+/* ------------------------------------------------------------- escaneo IA */
+
+.scan-zone {
+  margin-bottom: 12px;
+}
+.btn-scan {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--tint);
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all .15s ease;
+}
+.btn-scan:hover {
+  background: var(--line-soft);
+  border-color: var(--ink-2);
+  color: var(--ink);
+}
+.scan-status {
+  margin-top: 8px;
+  font-size: 12.5px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.4;
+}
+.scan-status.loading {
+  background: var(--blue-soft);
+  color: var(--blue);
+}
+.scan-status.success {
+  background: var(--green-soft);
+  color: var(--green);
+}
+.scan-status.error {
+  background: var(--tint);
+  color: var(--crit);
+}
+
 .form { display: flex; flex-direction: column; gap: 12px; }
 .form .row { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
 .form label {

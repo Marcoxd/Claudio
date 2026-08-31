@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>{{ app_name }} · {{ period_label }}</title>
-<link rel="stylesheet" href="/static/style.css?v=18">
+<link rel="stylesheet" href="/static/style.css?v=20">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='13' fill='%23c25a3e'/></svg>">
 <script>
   (function() {
@@ -452,6 +452,17 @@
     <!-- Formulario 1: Movimiento -->
     <form id="modal-form-mov" class="form modal-form-pane" method="post" action="/movimientos/nuevo?t={{ token }}">
       <input type="hidden" name="period" value="{{ period }}">
+
+      <!-- Escanear factura con IA -->
+      <div class="scan-zone">
+        <input type="file" id="scan-file-input" accept="image/jpeg,image/png,image/webp,image/heic,application/pdf" style="display: none;">
+        <button type="button" class="btn-scan" id="btn-trigger-scan">
+          <span>📷</span>
+          <span><b>Subir foto o PDF</b> · autocompletar con IA</span>
+        </button>
+        <div id="scan-status" class="scan-status" style="display: none;"></div>
+      </div>
+
       <div class="toggle" style="margin-bottom: 4px;">
         <input type="radio" name="kind" value="expense" id="m-k-expense" checked>
         <label for="m-k-expense">Gasto</label>
@@ -725,6 +736,76 @@ if (monthWrap && mp) {
       showTab(r.value);
     });
   });
+
+  // ---- Escaneo de recibos/facturas con IA
+  var btnScan = document.getElementById('btn-trigger-scan');
+  var inputScan = document.getElementById('scan-file-input');
+  var scanStatus = document.getElementById('scan-status');
+
+  if (btnScan && inputScan && scanStatus) {
+    btnScan.addEventListener('click', function () {
+      inputScan.click();
+    });
+
+    inputScan.addEventListener('change', async function () {
+      if (!inputScan.files || !inputScan.files[0]) return;
+      var file = inputScan.files[0];
+
+      scanStatus.style.display = 'flex';
+      scanStatus.className = 'scan-status loading';
+      scanStatus.innerHTML = '✨ <span>Analizando factura con IA (Gemini)…</span>';
+
+      var formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        var resp = await fetch('/api/scan?t={{ token }}', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!resp.ok) {
+          throw new Error('Error en el servidor');
+        }
+
+        var data = await resp.json();
+        if (data.ok) {
+          if (data.amount !== undefined && data.amount > 0) {
+            fMov.querySelector('input[name="amount"]').value = data.amount;
+          }
+          if (data.description) {
+            fMov.querySelector('input[name="description"]').value = data.description;
+          }
+          if (data.date) {
+            fMov.querySelector('input[name="date"]').value = data.date;
+          }
+          if (data.category_id) {
+            fMov.querySelector('select[name="category_id"]').value = data.category_id;
+          }
+          if (data.account_id) {
+            fMov.querySelector('select[name="account_id"]').value = data.account_id;
+          }
+          if (data.kind) {
+            var radio = document.getElementById(data.kind === 'income' ? 'm-k-income' : 'm-k-expense');
+            if (radio) radio.checked = true;
+          }
+          if (data.installments && data.installments > 1) {
+            fMov.querySelector('input[name="installments"]').value = data.installments;
+          }
+
+          scanStatus.className = 'scan-status success';
+          scanStatus.innerHTML = '✅ <span><b>¡Factura leída con éxito!</b> Total: $' + (data.amount ? Number(data.amount).toFixed(2) : '0.00') + (data.merchant ? ' · ' + data.merchant : '') + '</span>';
+        } else {
+          throw new Error('No se detectaron datos');
+        }
+      } catch (err) {
+        scanStatus.className = 'scan-status error';
+        scanStatus.innerHTML = '⚠️ <span>No se pudo leer la factura automáticamente. Puedes ingresar los datos a mano.</span>';
+      } finally {
+        inputScan.value = '';
+      }
+    });
+  }
 })();
 </script>
 </body>

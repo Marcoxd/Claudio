@@ -7,7 +7,7 @@ import io
 import secrets
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, Form, HTTPException, Query, Request, Response
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Request, Response, UploadFile
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
@@ -15,6 +15,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
 from app.db import SessionLocal
+from app.services import ai
+from app.services.capture import _match_account, _match_category, build_context
 from app.models import (
     ACCOUNT_CREDIT,
     KIND_EXPENSE,
@@ -454,6 +456,47 @@ async def export_transactions(
             "Cache-Control": "no-cache",
         },
     )
+
+
+@router.post("/api/scan")
+async def scan_receipt(
+    file: UploadFile = File(...),
+    token: str = Depends(check_token),
+    session: AsyncSession = Depends(get_session),
+) -> dict:
+    """Escanea una imagen o PDF de factura con Gemini y devuelve los campos para autocompletar el formulario."""
+    mime_type = file.content_type or "image/jpeg"
+    data = await file.read()
+    if not data:
+        raise HTTPException(status_code=400, detail="Archivo vacío")
+
+    ctx = await build_context(session)
+    parsed = await ai.parse_document(data, mime_type, ctx)
+
+    cat_id = await _match_category(session, parsed.category, parsed.kind)
+    acc_id = await _match_account(session, parsed.account)
+
+    return {
+        "ok": True,
+        "kind": parsed.kind,
+        "amount": float(parsed.amount),
+        "description": parsed.description or parsed.merchant or "Compra",
+        "merchant": parsed.merchant or "",
+        "date": parsed.date or today().isoformat(),
+        "category_id": cat_id,
+        "account_id": acc_id,
+        "installments": parsed.installments or 1,
+        "notes": parsed.notes or "",
+        "items": [
+            {
+                "name": it.name,
+                "quantity": it.quantity,
+                "unit_price": it.unit_price,
+                "total": it.total,
+            }
+            for it in parsed.items
+        ],
+    }
 
 
 @router.get("/salir")

@@ -55,3 +55,35 @@ async def test_export_transactions(session):
     content_todo = res_todo.body.decode("utf-8-sig")
     assert "Almuerzo" in content_todo
     assert "Supermercado" in content_todo
+
+
+async def test_scan_receipt_endpoint(session, monkeypatch):
+    from fastapi import UploadFile
+    import io
+    from app.services.ai import ParsedCapture, ParsedItem
+    from app.web.api import scan_receipt
+
+    async def fake_parse_document(data, mime, ctx, caption=""):
+        return ParsedCapture(
+            kind=KIND_EXPENSE,
+            amount=D("36.80"),
+            description="Pago internet CNT",
+            merchant="CNT",
+            category="Servicios",
+            date="2026-08-31",
+            items=[ParsedItem(name="Internet", total=D("36.80"))],
+        )
+
+    monkeypatch.setattr("app.services.ai.parse_document", fake_parse_document)
+
+    file = UploadFile(
+        filename="recibo.jpg",
+        file=io.BytesIO(b"fake_image_data"),
+        headers={"content-type": "image/jpeg"},
+    )
+
+    data = await scan_receipt(file=file, token="test", session=session)
+    assert data["ok"] is True
+    assert data["amount"] == 36.80
+    assert data["description"] == "Pago internet CNT"
+    assert data["merchant"] == "CNT"
