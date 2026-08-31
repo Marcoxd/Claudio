@@ -426,6 +426,77 @@ td.num, th.num { text-align: right; padding-right: 0; }
 td.num { font-variant-numeric: tabular-nums; color: var(--ink); }
 .scroll { overflow-x: auto; }
 
+.cat-select {
+  font: inherit;
+  font-size: 12.5px;
+  color: var(--ink);
+  background: var(--tint);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 3px 6px;
+  cursor: pointer;
+  max-width: 140px;
+  text-overflow: ellipsis;
+  outline: none;
+  transition: border-color .15s, background .15s;
+}
+.cat-select:hover, .cat-select:focus {
+  border-color: var(--line);
+  background: var(--card);
+}
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.filter-select {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--tint);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  outline: none;
+}
+.filter-select:hover, .filter-select:focus {
+  border-color: var(--ink-2);
+  background: var(--card);
+}
+.bar-row.clickable {
+  cursor: pointer;
+  padding: 4px 6px;
+  margin: -4px -6px;
+  border-radius: 6px;
+  transition: background .15s;
+}
+.bar-row.clickable:hover {
+  background: var(--tint);
+}
+.filter-badge {
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 99px;
+  background: var(--blue-soft);
+  color: var(--blue);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.filter-badge button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  font-size: 12px;
+  font-weight: bold;
+}
+
 /* En pantallas chicas la tabla se queda con lo esencial. */
 @media (max-width: 640px) {
   .hide-sm { display: none; }

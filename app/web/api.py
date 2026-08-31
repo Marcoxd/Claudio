@@ -376,6 +376,21 @@ async def delete_transaction(
     return _redirect_to(period, token)
 
 
+@router.post("/movimientos/{transaction_id}/categoria")
+async def update_transaction_category(
+    transaction_id: int,
+    category_id: int | None = Form(default=None),
+    period: str | None = Form(default=None),
+    token: str = Depends(check_token),
+    session: AsyncSession = Depends(get_session),
+) -> RedirectResponse:
+    tx = await session.get(Transaction, transaction_id)
+    if tx is not None:
+        tx.category_id = category_id if category_id and category_id > 0 else None
+        await session.flush()
+    return _redirect_to(period, token)
+
+
 @router.get("/exportar")
 async def export_transactions(
     tipo: str = Query(default="mes"),

@@ -87,3 +87,35 @@ async def test_scan_receipt_endpoint(session, monkeypatch):
     assert data["amount"] == 36.80
     assert data["description"] == "Pago internet CNT"
     assert data["merchant"] == "CNT"
+
+
+async def test_update_transaction_category(session):
+    from sqlalchemy import select
+    from app.models import Category
+    from app.web.api import update_transaction_category
+
+    cat = (await session.execute(select(Category))).scalars().first()
+    assert cat is not None
+
+    tx = Transaction(
+        kind=KIND_EXPENSE,
+        date=dt.date(2026, 8, 20),
+        amount=D("25.00"),
+        description="Cena",
+        period="2026-08",
+    )
+    session.add(tx)
+    await session.flush()
+
+    # Asignar categoría
+    res = await update_transaction_category(
+        transaction_id=tx.id, category_id=cat.id, period="2026-08", token="test", session=session
+    )
+    assert res.status_code == 303
+    assert tx.category_id == cat.id
+
+    # Quitar categoría
+    await update_transaction_category(
+        transaction_id=tx.id, category_id=None, period="2026-08", token="test", session=session
+    )
+    assert tx.category_id is None
