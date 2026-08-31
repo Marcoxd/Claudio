@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>{{ app_name }} · {{ period_label }}</title>
-<link rel="stylesheet" href="/static/style.css?v=14">
+<link rel="stylesheet" href="/static/style.css?v=15">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='13' fill='%23c25a3e'/></svg>">
 <script>
   (function() {
@@ -439,6 +439,16 @@
       <button type="button" class="modal-close" id="btn-close-modal" title="Cerrar (Esc)">✕</button>
     </div>
 
+    <!-- Pestañas para elegir tipo de registro -->
+    <div class="toggle modal-tab-toggle" style="margin-bottom: 20px; width: 100%; display: flex;">
+      <input type="radio" name="modal_tab" value="mov" id="tab-mov" checked>
+      <label for="tab-mov" style="flex: 1; text-align: center;">Movimiento</label>
+      <input type="radio" name="modal_tab" value="tarjeta" id="tab-tarjeta">
+      <label for="tab-tarjeta" style="flex: 1; text-align: center;">Tarjeta</label>
+      <input type="radio" name="modal_tab" value="fijo" id="tab-fijo">
+      <label for="tab-fijo" style="flex: 1; text-align: center;">Gasto fijo</label>
+    </div>
+
     <!-- Formulario 1: Movimiento -->
     <form id="modal-form-mov" class="form modal-form-pane" method="post" action="/movimientos/nuevo?t={{ token }}">
       <input type="hidden" name="period" value="{{ period }}">
@@ -644,6 +654,9 @@ if (monthWrap && mp) {
   var title = document.getElementById('modal-title');
 
   function showTab(tab) {
+    var radio = document.getElementById('tab-' + tab);
+    if (radio) radio.checked = true;
+
     fMov.style.display = tab === 'mov' ? 'flex' : 'none';
     fTarjeta.style.display = tab === 'tarjeta' ? 'flex' : 'none';
     fFijo.style.display = tab === 'fijo' ? 'flex' : 'none';
@@ -700,6 +713,12 @@ if (monthWrap && mp) {
     if (e.key === 'Escape' && modal.style.display !== 'none') {
       window.closeAddModal();
     }
+  });
+
+  modal.querySelectorAll('input[name="modal_tab"]').forEach(function (r) {
+    r.addEventListener('change', function () {
+      showTab(r.value);
+    });
   });
 })();
 </script>
