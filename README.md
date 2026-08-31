@@ -200,6 +200,14 @@ PYTHONPATH=. python scripts/simular.py --guion    # una demo de corrido
 Escribes como en el chat; «1», «2»… pulsan los botones. Sirve para probar
 cambios sin tocar tu bot de verdad, y para enseñárselo a alguien.
 
+En Windows, la consola usa por defecto una codificación (cp1252) que no
+soporta los emojis ni los caracteres de caja (`┌│└`) que dibuja el script;
+fuerza UTF-8 con el flag `-X utf8` de Python:
+
+```bash
+PYTHONPATH=. python -X utf8 scripts/simular.py --guion
+```
+
 ¿Quieres verlo con datos de ejemplo antes de configurar nada?
 
 ```bash
