@@ -51,10 +51,10 @@ class ParsedCapture(BaseModel):
     income_type: str = ""               # sueldo | asesoramiento | extra | otro
     installments: int = 1               # diferido a N meses
     people: list[str] = Field(default_factory=list)
-    split_mode: Literal["", "equal", "items"] = ""
+    split_mode: Literal["equal", "items"] | None = None
     is_statement: bool = False          # ¿es un estado de cuenta, no un recibo?
     is_buffer: bool = False             # ¿usó/repuso el colchón?
-    buffer_direction: Literal["", "use", "repay"] = ""
+    buffer_direction: Literal["use", "repay"] | None = None
     items: list[ParsedItem] = Field(default_factory=list)
     notes: str = ""
     confidence: float = 0.5
@@ -125,8 +125,10 @@ Reglas:
 - `people`: nombres de otras personas mencionadas para dividir la cuenta.
   Si dice "con Juan y Pedro", pon ["Juan","Pedro"] y split_mode="equal".
   Si dice "yo pagué solo lo mío" o pide separar por productos, usa split_mode="items".
+  Si no se menciona dividir con nadie, deja split_mode=null.
 - Colchón: si menciona "colchón", "el dinero que no es mío", "saqué del colchón" → is_buffer=true
   con buffer_direction="use"; si dice "repuse", "devolví al colchón" → "repay".
+  Si no se menciona el colchón, deja buffer_direction=null.
 - En recibos y facturas extrae TODOS los ítems de la lista de productos en `items`,
   con su cantidad y precio. IVA, propina/servicio y descuentos van como ítems aparte
   con kind="tax", "tip" o "discount".

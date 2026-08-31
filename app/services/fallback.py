@@ -159,7 +159,7 @@ def parse_text_rules(text: str, ctx: dict | None = None):
     if pm:
         people = [p.strip() for p in re.split(r",|\sy\s", pm.group(1)) if p.strip()]
 
-    buffer_direction = ""
+    buffer_direction = None
     if any(_strip(w) in flat for w in BUFFER_REPAY_WORDS) and "colchon" in flat:
         buffer_direction = "repay"
     elif "colchon" in flat:
@@ -177,7 +177,7 @@ def parse_text_rules(text: str, ctx: dict | None = None):
         account=account,
         installments=installments,
         people=people,
-        split_mode="equal" if people else "",
+        split_mode="equal" if people else None,
         is_buffer=bool(buffer_direction),
         buffer_direction=buffer_direction,
         notes="Interpretado sin IA (reglas locales)",

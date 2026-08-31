@@ -1,19 +1,31 @@
 """Dashboard web y API de solo lectura."""
 from __future__ import annotations
 
+import datetime as dt
 import secrets
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
+from fastapi import APIRouter, Depends, Form, HTTPException, Query, Request, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import settings
 from app.db import SessionLocal
-from app.money import ZERO
+from app.models import (
+    ACCOUNT_CREDIT,
+    KIND_EXPENSE,
+    KIND_INCOME,
+    Account,
+    Category,
+    FixedExpense,
+    Transaction,
+)
+from app.money import D, ZERO
 from app.services import buffer as buffer_service
 from app.services.cards import (
+    build_installments,
     card_balance,
     cut_day_of,
     deferred_purchases,
@@ -22,7 +34,7 @@ from app.services.cards import (
     statement_window,
 )
 from app.services.format import money, pct, period_short
-from app.services.periods import add_months, current_period, period_label, today
+from app.services.periods import add_months, current_period, period_label, period_of, today
 from app.services.reports import cashflow, month_report, recent_transactions
 from app.services.splits import balances
 
@@ -127,6 +139,15 @@ async def dashboard(
         for d in await deferred_purchases(session, period)
     ]
 
+    categories_all = (
+        await session.execute(select(Category).order_by(Category.kind, Category.name))
+    ).scalars().all()
+    accounts_all = (
+        await session.execute(
+            select(Account).where(Account.active.is_(True)).order_by(Account.name)
+        )
+    ).scalars().all()
+
     top = report.by_category[:10]
     biggest = top[0].amount if top else ZERO
     categories = [
@@ -161,6 +182,9 @@ async def dashboard(
         "buffer": buffer_state,
         "chart": _line_chart(flow),
         "token": token,
+        "today_iso": today().isoformat(),
+        "all_categories": categories_all,
+        "all_accounts": accounts_all,
     }
     context.pop("request", None)
     page = TEMPLATES.TemplateResponse(request, "dashboard.html", context)
@@ -238,6 +262,113 @@ async def run_reminders(
     finally:
         await bot.session.close()
     return {"sent": True, "targets": len(targets)}
+
+
+def _redirect_to(period: str | None, token: str) -> RedirectResponse:
+    url = f"/?t={token}" + (f"&period={period}" if period else "")
+    return RedirectResponse(url, status_code=303)
+
+
+@router.post("/tarjetas/nueva")
+async def create_card(
+    period: str | None = Form(default=None),
+    name: str = Form(...),
+    cut_day: int = Form(...),
+    due_day: int = Form(...),
+    credit_limit: str = Form(default=""),
+    token: str = Depends(check_token),
+    session: AsyncSession = Depends(get_session),
+) -> RedirectResponse:
+    limit = D(credit_limit) if credit_limit.strip() else None
+    session.add(
+        Account(
+            name=name.strip()[:64],
+            type=ACCOUNT_CREDIT,
+            cut_day=max(1, min(31, cut_day)),
+            due_day=max(1, min(31, due_day)),
+            credit_limit=limit,
+        )
+    )
+    await session.flush()
+    return _redirect_to(period, token)
+
+
+@router.post("/fijos/nuevo")
+async def create_fixed(
+    period: str | None = Form(default=None),
+    name: str = Form(...),
+    amount: str = Form(...),
+    due_day: int = Form(...),
+    category_id: str = Form(default=""),
+    account_id: str = Form(default=""),
+    token: str = Depends(check_token),
+    session: AsyncSession = Depends(get_session),
+) -> RedirectResponse:
+    session.add(
+        FixedExpense(
+            name=name.strip()[:96],
+            amount=D(amount),
+            due_day=max(1, min(31, due_day)),
+            category_id=int(category_id) if category_id else None,
+            account_id=int(account_id) if account_id else None,
+            start_period=period or current_period(),
+        )
+    )
+    await session.flush()
+    return _redirect_to(period, token)
+
+
+@router.post("/movimientos/nuevo")
+async def create_transaction(
+    period: str | None = Form(default=None),
+    kind: str = Form(...),
+    date: str = Form(...),
+    description: str = Form(...),
+    amount: str = Form(...),
+    category_id: str = Form(default=""),
+    account_id: str = Form(default=""),
+    installments: int = Form(default=1),
+    token: str = Depends(check_token),
+    session: AsyncSession = Depends(get_session),
+) -> RedirectResponse:
+    parsed_date = dt.date.fromisoformat(date)
+    account = await session.get(Account, int(account_id)) if account_id else None
+    kind = KIND_INCOME if kind == "income" else KIND_EXPENSE
+
+    tx = Transaction(
+        kind=kind,
+        date=parsed_date,
+        amount=D(amount),
+        description=description.strip()[:255],
+        category_id=int(category_id) if category_id else None,
+        account_id=account.id if account else None,
+        period=period_of(parsed_date),
+        installments_total=max(1, installments) if kind == KIND_EXPENSE else 1,
+        source="manual",
+    )
+    session.add(tx)
+    await session.flush()
+
+    if account and account.type == ACCOUNT_CREDIT and kind == KIND_EXPENSE:
+        for inst in build_installments(tx, account, tx.installments_total):
+            session.add(inst)
+        await session.flush()
+
+    return _redirect_to(period, token)
+
+
+@router.post("/movimientos/{transaction_id}/borrar")
+async def delete_transaction(
+    transaction_id: int,
+    period: str | None = Form(default=None),
+    token: str = Depends(check_token),
+    session: AsyncSession = Depends(get_session),
+) -> RedirectResponse:
+    tx = await session.get(Transaction, transaction_id)
+    if tx is not None:
+        await session.delete(tx)
+        await session.flush()
+    return _redirect_to(period, token)
 
 
 @router.get("/salir")

@@ -169,6 +169,43 @@
         {% else %}
         <p class="empty">Sin gastos fijos configurados.</p>
         {% endif %}
+
+        <details class="addbox">
+          <summary>Nuevo gasto fijo</summary>
+          <div class="body">
+            <form class="form" method="post" action="/fijos/nuevo?t={{ token }}">
+              <input type="hidden" name="period" value="{{ period }}">
+              <label>Nombre
+                <input type="text" name="name" placeholder="Arriendo" required maxlength="96">
+              </label>
+              <div class="row">
+                <label>Monto mensual
+                  <input type="number" name="amount" min="0" step="0.01" required placeholder="$">
+                </label>
+                <label>Día del mes
+                  <input type="number" name="due_day" min="1" max="31" required>
+                </label>
+                <label>Categoría
+                  <select name="category_id">
+                    <option value="">— sin categoría —</option>
+                    {% for c in all_categories %}
+                    <option value="{{ c.id }}">{{ c.label() }}</option>
+                    {% endfor %}
+                  </select>
+                </label>
+                <label>Medio de pago
+                  <select name="account_id">
+                    <option value="">— sin definir —</option>
+                    {% for a in all_accounts %}
+                    <option value="{{ a.id }}">{{ a.name }}</option>
+                    {% endfor %}
+                  </select>
+                </label>
+              </div>
+              <button class="btn" type="submit">Crear gasto fijo</button>
+            </form>
+          </div>
+        </details>
       </section>
     </div>
 
@@ -243,6 +280,30 @@
         {% else %}
         <p class="empty">Sin tarjetas registradas. Usa <code>/setup</code> en el bot.</p>
         {% endif %}
+
+        <details class="addbox">
+          <summary>Nueva tarjeta</summary>
+          <div class="body">
+            <form class="form" method="post" action="/tarjetas/nueva?t={{ token }}">
+              <input type="hidden" name="period" value="{{ period }}">
+              <label>Nombre
+                <input type="text" name="name" placeholder="Visa Pichincha" required maxlength="64">
+              </label>
+              <div class="row">
+                <label>Día de corte
+                  <input type="number" name="cut_day" min="1" max="31" required>
+                </label>
+                <label>Día de pago
+                  <input type="number" name="due_day" min="1" max="31" required>
+                </label>
+                <label>Cupo (opcional)
+                  <input type="number" name="credit_limit" min="0" step="0.01" placeholder="$">
+                </label>
+              </div>
+              <button class="btn" type="submit">Crear tarjeta</button>
+            </form>
+          </div>
+        </details>
       </section>
 
       <!-- ---------------------------------------------------- diferidos -->
@@ -327,7 +388,7 @@
         <thead>
           <tr>
             <th>Fecha</th><th>Detalle</th><th class="hide-sm">Categoría</th><th class="hide-sm">Pago</th>
-            <th class="num">Total</th><th class="num">Mi parte</th>
+            <th class="num">Total</th><th class="num">Mi parte</th><th></th>
           </tr>
         </thead>
         <tbody>
@@ -345,6 +406,13 @@
             </td>
             <td class="num">{{ t.amount | money }}</td>
             <td class="num">{% if t.my_share is not none %}{{ t.my_share | money }}{% else %}—{% endif %}</td>
+            <td>
+              <form class="inline" method="post" action="/movimientos/{{ t.id }}/borrar?t={{ token }}"
+                    onsubmit="return confirm('¿Borrar este movimiento?')">
+                <input type="hidden" name="period" value="{{ period }}">
+                <button class="del" type="submit" title="Borrar">✕</button>
+              </form>
+            </td>
           </tr>
           {% endfor %}
         </tbody>
@@ -353,6 +421,52 @@
     {% else %}
     <p class="empty">Nada registrado todavía. Escríbele al bot para empezar.</p>
     {% endif %}
+
+    <details class="addbox">
+      <summary>Nuevo movimiento</summary>
+      <div class="body">
+        <form class="form" method="post" action="/movimientos/nuevo?t={{ token }}">
+          <input type="hidden" name="period" value="{{ period }}">
+          <div class="kind">
+            <label><input type="radio" name="kind" value="expense" checked> Gasto</label>
+            <label><input type="radio" name="kind" value="income"> Ingreso</label>
+          </div>
+          <div class="row">
+            <label>Fecha
+              <input type="date" name="date" value="{{ today_iso }}" required>
+            </label>
+            <label>Monto
+              <input type="number" name="amount" min="0.01" step="0.01" required placeholder="$">
+            </label>
+          </div>
+          <label>Descripción
+            <input type="text" name="description" required maxlength="255" placeholder="Almuerzo, Uber, Netflix…">
+          </label>
+          <div class="row">
+            <label>Categoría
+              <select name="category_id">
+                <option value="">— sin categoría —</option>
+                {% for c in all_categories %}
+                <option value="{{ c.id }}">{{ c.label() }}</option>
+                {% endfor %}
+              </select>
+            </label>
+            <label>Medio de pago
+              <select name="account_id">
+                <option value="">— sin definir —</option>
+                {% for a in all_accounts %}
+                <option value="{{ a.id }}">{{ a.name }}</option>
+                {% endfor %}
+              </select>
+            </label>
+            <label>Cuotas
+              <input type="number" name="installments" min="1" max="72" value="1">
+            </label>
+          </div>
+          <button class="btn" type="submit">Registrar</button>
+        </form>
+      </div>
+    </details>
   </section>
 
   <p class="foot">{{ app_name }} · <a href="/salir">cerrar sesión</a></p>
