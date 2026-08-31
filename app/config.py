@@ -15,7 +15,7 @@ class Settings(BaseSettings):
 
     # --- Marca (personalizable por cliente) ---
     app_name: str = "Kuri"
-    app_version: str = "1.0.0"
+    app_version: str = "1.0.1"
     app_tagline: str = "Tus finanzas, en un chat"
     owner_name: str = ""          # nombre del cliente, para saludarlo
 

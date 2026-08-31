@@ -85,3 +85,14 @@ async def telegram_webhook(
     update = Update.model_validate(await request.json(), context={"bot": request.app.state.bot})
     await request.app.state.dp.feed_update(request.app.state.bot, update)
     return {"ok": True}
+
+
+@app.get("/health", include_in_schema=False)
+@app.get("/ping", include_in_schema=False)
+async def health_check() -> dict:
+    """Endpoint público para health checks (Render, Railway, UptimeRobot, cron-job.org)."""
+    return {
+        "status": "ok",
+        "app": settings.app_name,
+        "version": settings.app_version,
+    }
