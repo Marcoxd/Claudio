@@ -408,7 +408,7 @@ async def export_transactions(
 
     output = io.StringIO()
     output.write("\ufeff")  # BOM UTF-8 para compatibilidad nativa con Excel
-    writer = csv.writer(output, delimiter=",", quoting=csv.QUOTE_MINIMAL)
+    writer = csv.writer(output, delimiter=";", quoting=csv.QUOTE_MINIMAL)
 
     writer.writerow([
         "ID",
