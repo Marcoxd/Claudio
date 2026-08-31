@@ -5,8 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>{{ app_name }} · {{ period_label }}</title>
-<link rel="stylesheet" href="/static/style.css?v=7">
+<link rel="stylesheet" href="/static/style.css?v=8">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='13' fill='%23c25a3e'/></svg>">
+<script>
+  (function() {
+    var saved = localStorage.getItem('kuri_theme');
+    if (saved) {
+      document.documentElement.setAttribute('data-theme', saved);
+    }
+  })();
+</script>
 </head>
 <body>
 <div class="wrap">
@@ -16,14 +24,17 @@
       <h1>{{ app_name }}</h1>
       <span>{% if owner %}{{ owner }}{% else %}{{ tagline }}{% endif %}</span>
     </div>
-    <nav class="monthnav">
-      <a href="/?period={{ prev_period }}" title="Mes anterior">←</a>
-      <label class="month-pick">
-        <span class="current">{{ period_label }}</span>
-        <input type="month" value="{{ period }}" class="month-input">
-      </label>
-      <a href="/?period={{ next_period }}" title="Mes siguiente">→</a>
-    </nav>
+    <div class="top-actions">
+      <nav class="monthnav">
+        <a href="/?period={{ prev_period }}" title="Mes anterior">←</a>
+        <label class="month-pick">
+          <span class="current">{{ period_label }}</span>
+          <input type="month" value="{{ period }}" class="month-input">
+        </label>
+        <a href="/?period={{ next_period }}" title="Mes siguiente">→</a>
+      </nav>
+      <button id="theme-toggle" class="theme-btn" type="button" title="Cambiar tema">☀️</button>
+    </div>
   </header>
 
   <!-- ------------------------------------------------------------ hero -->
@@ -576,6 +587,30 @@ if (mp) {
       fAno.style.display = r.value === 'ano' ? 'block' : 'none';
       fTodo.style.display = r.value === 'todo' ? 'block' : 'none';
     });
+  });
+})();
+
+// ---- theme switcher (claro / oscuro)
+(function () {
+  var btn = document.getElementById('theme-toggle');
+  if (!btn) return;
+
+  function updateIcon() {
+    var theme = document.documentElement.getAttribute('data-theme');
+    var isDark = theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    btn.innerHTML = isDark ? '☀️' : '🌙';
+    btn.title = isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
+  }
+
+  updateIcon();
+
+  btn.addEventListener('click', function () {
+    var theme = document.documentElement.getAttribute('data-theme');
+    var isDark = theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    var next = isDark ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('kuri_theme', next);
+    updateIcon();
   });
 })();
 </script>
