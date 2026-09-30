@@ -501,13 +501,26 @@ def tts_google(texto, voz, vel):
     return wav
 
 
+def tts_azure(texto, voz, vel):
+    """Voz oficial de Segania (es-MX-DaliaNeural) por Azure Speech, con licencia para uso comercial.
+    Lee AZURE_SPEECH_KEY y AZURE_SPEECH_REGION. vel: porcentaje, p. ej. 4 = "+4%"."""
+    key, reg = os.environ["AZURE_SPEECH_KEY"], os.environ.get("AZURE_SPEECH_REGION", "eastus")
+    ssml = (f'<speak version="1.0" xml:lang="es-MX"><voice name="{voz}"><prosody rate="{vel:+.0f}%">'
+            f'{html.escape(texto)}</prosody></voice></speak>')
+    req = urllib.request.Request(f"https://{reg}.tts.speech.microsoft.com/cognitiveservices/v1", data=ssml.encode(),
+                                 headers={"Ocp-Apim-Subscription-Key": key, "Content-Type": "application/ssml+xml",
+                                          "X-Microsoft-OutputFormat": "riff-24khz-16bit-mono-pcm", "User-Agent": "segania-cursos"})
+    wav, _ = sf.read(io.BytesIO(urllib.request.urlopen(req, timeout=120).read()), dtype="float32")
+    return wav
+
+
 def frase(texto, motor, voz, vel):
     cache = TTS_DIR / "cache"
     cache.mkdir(parents=True, exist_ok=True)
     f = cache / (hashlib.sha1(f"{motor}|{voz}|{vel}|{texto}".encode()).hexdigest()[:20] + ".wav")
     if f.exists():
         return sf.read(f, dtype="float32")[0]
-    wav = (tts_google if motor == "google" else tts_kokoro)(texto, voz, vel)
+    wav = {"google": tts_google, "azure": tts_azure}.get(motor, tts_kokoro)(texto, voz, vel)
     # recorta silencios del modelo en los extremos
     idx = np.where(np.abs(wav) > 0.01)[0]
     if len(idx):
@@ -615,13 +628,13 @@ def render_worker(wid, tareas, htmls, frdir):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("leccion")
-    ap.add_argument("--motor", choices=["kokoro", "google"], default="kokoro")
+    ap.add_argument("--motor", choices=["kokoro", "google", "azure"], default="kokoro")
     ap.add_argument("--voz", default=None)
     ap.add_argument("--velocidad", type=float, default=None)
     ap.add_argument("--muestras", action="store_true")
     a = ap.parse_args()
-    voz = a.voz or ("ef_dora" if a.motor == "kokoro" else "es-US-Chirp3-HD-Kore")
-    vel = a.velocidad or (0.96 if a.motor == "kokoro" else 1.0)
+    voz = a.voz or {"kokoro": "ef_dora", "google": "es-US-Chirp3-HD-Kore", "azure": "es-MX-DaliaNeural"}[a.motor]
+    vel = a.velocidad if a.velocidad is not None else {"kokoro": 0.96, "google": 1.0, "azure": 4}[a.motor]
 
     les = json.loads(Path(a.leccion).read_text())
     lid = les["id"]

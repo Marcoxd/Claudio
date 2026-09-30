@@ -294,8 +294,8 @@
       ],
       "voz": [
         "Pagar no es suficiente. También hay que registrar.",
-        "El pago de los décimos se registra en el sistema SUT del Ministerio del Trabajo, dentro del cronograma que se publica cada año.",
-        "Ese cronograma depende del noveno dígito del RUC de la empresa, así que revisa qué fechas te tocan.",
+        "El pago de los décimos se registra en el Sistema Único de Trabajo del Ministerio, dentro del cronograma que se publica cada año.",
+        "Ese cronograma depende del noveno dígito del Registro Único de Contribuyentes de la empresa, así que revisa qué fechas te tocan.",
         "Si un trabajador sale antes de la fecha de pago, los valores proporcionales que tenga pendientes van en su liquidación.",
         "Y guarda siempre los comprobantes: es lo primero que pide un inspector de trabajo."
       ]
