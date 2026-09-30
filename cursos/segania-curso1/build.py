@@ -57,7 +57,7 @@ body.dark .b1{background:#274b7a;opacity:.6}
 body.dark .b2{background:#6b5320;opacity:.35}
 @keyframes drift1{0%{transform:translate(0,0)}50%{transform:translate(260px,140px)}100%{transform:translate(0,0)}}
 @keyframes drift2{0%{transform:translate(0,0)}50%{transform:translate(-240px,-120px)}100%{transform:translate(0,0)}}
-.grain{position:absolute;inset:-100px;background:url(GRAIN) repeat;opacity:.07;z-index:40;pointer-events:none;animation:grain 1s steps(6) infinite}
+.grain{position:absolute;inset:-100px;background:url(GRAIN) repeat;opacity:.07;z-index:40;pointer-events:none;}
 body.dark .grain{opacity:.1}
 @keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-37px,21px)}40%{transform:translate(18px,-44px)}60%{transform:translate(-12px,33px)}80%{transform:translate(41px,9px)}100%{transform:translate(0,0)}}
 
@@ -664,7 +664,7 @@ def main():
     ff = imageio_ffmpeg.get_ffmpeg_exe()
     mp4 = outd / f"leccion-{lid}.mp4"
     subprocess.run([ff, "-y", "-loglevel", "error", "-framerate", str(FPS), "-i", str(work / "fr" / "%06d.jpg"), "-i", str(mezcla),
-                    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "18", "-preset", "medium",
+                    "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "24", "-preset", "slow", "-tune", "stillimage",
                     "-af", "loudnorm=I=-16:TP=-1.5:LRA=11", "-c:a", "aac", "-b:a", "192k", "-ar", "48000",
                     "-shortest", "-movflags", "+faststart", str(mp4)], check=True)
     shutil.rmtree(work / "fr")
