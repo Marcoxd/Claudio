@@ -1,0 +1,394 @@
+{
+  "id": "3.3",
+  "curso": "Gestión laboral y cumplimiento legal en Ecuador",
+  "modulo": "Nómina y beneficios · Módulo 3",
+  "titulo": "Décimo tercero y décimo cuarto",
+  "siguiente": "3.4 · Horas suplementarias y extraordinarias",
+  "escenas": [
+    {
+      "tipo": "apertura",
+      "titulo": "Décimo tercero y décimo cuarto",
+      "subtitulo": "Cálculo, plazos y registro",
+      "voz": "En esta lección vamos a ver dos pagos que ningún empleador en Ecuador puede pasar por alto: el décimo tercero y el décimo cuarto sueldo. Te voy a mostrar cómo se calculan, cuándo se pagan y qué tienes que registrar.",
+      "etiquetas": [
+        "Décimo tercero",
+        "Décimo cuarto",
+        "Registro en el SUT"
+      ]
+    },
+    {
+      "tipo": "comparar",
+      "titulo": "Dos pagos adicionales al sueldo",
+      "cols": [
+        {
+          "etiqueta": "Art. 111",
+          "titulo": "Décimo tercero",
+          "icono": "gift",
+          "texto": "La doceava parte de todo lo que el trabajador ganó en el año."
+        },
+        {
+          "etiqueta": "Art. 113",
+          "titulo": "Décimo cuarto",
+          "icono": "backpack",
+          "texto": "Un sueldo básico unificado: USD 482 en 2026."
+        }
+      ],
+      "nota": "Ninguno de los dos paga aportes al IESS ni impuesto a la renta.",
+      "voz": [
+        "El Código del Trabajo reconoce dos pagos adicionales al sueldo. El primero es el décimo tercero. Mucha gente lo conoce como bono navideño, y equivale a la doceava parte de todo lo que el trabajador ganó en el año.",
+        "El segundo es el décimo cuarto, o bono escolar. Aquí no importa cuánto gana la persona: equivale a un sueldo básico unificado.",
+        "Y un detalle que conviene tener claro: sobre ninguno de los dos se pagan aportes al Seguro Social, y tampoco impuesto a la renta."
+      ]
+    },
+    {
+      "tipo": "capitulo",
+      "numero": "01",
+      "titulo": "Décimo tercero",
+      "voz": "Empecemos por el décimo tercero."
+    },
+    {
+      "tipo": "linea",
+      "titulo": "¿Qué período se toma en cuenta?",
+      "meses": [
+        "Dic",
+        "Ene",
+        "Feb",
+        "Mar",
+        "Abr",
+        "May",
+        "Jun",
+        "Jul",
+        "Ago",
+        "Sep",
+        "Oct",
+        "Nov"
+      ],
+      "pasos": [
+        {
+          "rango": [
+            0,
+            11
+          ],
+          "rotulo": "12 meses",
+          "texto": "Del 1 de diciembre al 30 de noviembre"
+        },
+        {
+          "texto": "Pago acumulado: hasta el 24 de diciembre"
+        }
+      ],
+      "voz": [
+        "Para calcularlo se toma todo lo que el trabajador ganó en un período de doce meses: desde el uno de diciembre del año anterior hasta el treinta de noviembre.",
+        "Y si se paga de forma acumulada, la fecha límite es el veinticuatro de diciembre."
+      ]
+    },
+    {
+      "tipo": "dos_listas",
+      "titulo": "¿Qué se suma y qué no?",
+      "si": [
+        "Sueldo",
+        "Horas extra",
+        "Comisiones",
+        "Bonificaciones"
+      ],
+      "no": [
+        "Utilidades",
+        "Viáticos",
+        "Décimo cuarto",
+        "Fondos de reserva"
+      ],
+      "voz": [
+        "En ese total entran el sueldo, las horas extra, las comisiones y las bonificaciones.",
+        "Lo que no entra son las utilidades, los viáticos, el décimo cuarto y los fondos de reserva. Con esa suma, solo queda dividir para doce."
+      ]
+    },
+    {
+      "tipo": "calculo",
+      "titulo": "Un ejemplo: María",
+      "datos": [
+        [
+          "Sueldo mensual",
+          "USD 600"
+        ],
+        [
+          "Horas extra en el año",
+          "USD 240"
+        ],
+        [
+          "Trabajó",
+          "Todo el período"
+        ]
+      ],
+      "filas": [
+        [
+          "×",
+          "Sueldo × 12 meses",
+          "USD 7.200"
+        ],
+        [
+          "+",
+          "Horas extra",
+          "USD 240"
+        ],
+        [
+          "=",
+          "Total ganado",
+          "USD 7.440"
+        ],
+        [
+          "÷",
+          "Dividido para 12",
+          ""
+        ]
+      ],
+      "resultado": [
+        "Décimo tercero",
+        620
+      ],
+      "pasos": [
+        1,
+        2,
+        3,
+        4,
+        6
+      ],
+      "voz": [
+        "Veamos un caso. María gana seiscientos dólares al mes, trabajó todo el período y, además, recibió doscientos cuarenta dólares en horas extra.",
+        "Sus doce sueldos suman siete mil doscientos dólares.",
+        "Le agregamos las horas extra.",
+        "Y llegamos a siete mil cuatrocientos cuarenta dólares ganados en el período.",
+        "Dividimos para doce, y el resultado es su décimo tercero: seiscientos veinte dólares, que se le deben pagar hasta el veinticuatro de diciembre."
+      ]
+    },
+    {
+      "tipo": "capitulo",
+      "numero": "02",
+      "titulo": "Décimo cuarto",
+      "voz": "Ahora, el décimo cuarto."
+    },
+    {
+      "tipo": "cifra",
+      "etiqueta": "Décimo cuarto · 2026",
+      "valor": 482,
+      "prefijo": "USD",
+      "nota": "Igual para todos, proporcional al tiempo trabajado y a la jornada",
+      "voz": "Su valor es un sueldo básico unificado, que en dos mil veintiséis es de cuatrocientos ochenta y dos dólares. Es el mismo monto para quien gana el básico y para quien gana mucho más. Lo único que cambia es la proporción: si la persona trabajó menos de un año, o tiene jornada parcial, recibe la parte que le corresponde."
+    },
+    {
+      "tipo": "comparar",
+      "titulo": "La fecha depende de la región",
+      "cols": [
+        {
+          "etiqueta": "Costa y Galápagos",
+          "titulo": "15 de marzo",
+          "icono": "waves",
+          "texto": "Período: del 1 de marzo al último día de febrero."
+        },
+        {
+          "etiqueta": "Sierra y Amazonía",
+          "titulo": "15 de agosto",
+          "icono": "mountain",
+          "texto": "Período: del 1 de agosto al 31 de julio."
+        }
+      ],
+      "nota": "Cuenta la región donde la persona presta sus servicios.",
+      "voz": [
+        "Aquí hay una particularidad del Ecuador: la fecha cambia según la región. En la Costa y en Galápagos, el período va de marzo a febrero, y el pago acumulado vence el quince de marzo.",
+        "En la Sierra y en la Amazonía, el período va de agosto a julio, y el pago vence el quince de agosto.",
+        "Ojo: lo que cuenta es la región donde la persona trabaja, no dónde está la oficina principal."
+      ]
+    },
+    {
+      "tipo": "linea",
+      "titulo": "Un ejemplo: Carlos, en Quito",
+      "meses": [
+        "Ago",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dic",
+        "Ene",
+        "Feb",
+        "Mar",
+        "Abr",
+        "May",
+        "Jun",
+        "Jul"
+      ],
+      "pasos": [
+        {
+          "texto": "Sierra · período del 1 de agosto de 2025 al 31 de julio de 2026"
+        },
+        {
+          "rango": [
+            6,
+            11
+          ],
+          "rotulo": "Ingresó el 1 de febrero · 6 meses"
+        },
+        {
+          "texto": "482 ÷ 12 × 6 = USD 241",
+          "destacar": true
+        }
+      ],
+      "voz": [
+        "Veamos otro caso. Carlos trabaja en Quito, así que su período va del uno de agosto de dos mil veinticinco al treinta y uno de julio de dos mil veintiséis.",
+        "Pero Carlos entró a la empresa el uno de febrero, así que en ese período trabajó seis meses.",
+        "Entonces dividimos cuatrocientos ochenta y dos para doce, y multiplicamos por seis. A Carlos le corresponden doscientos cuarenta y un dólares, hasta el quince de agosto."
+      ]
+    },
+    {
+      "tipo": "capitulo",
+      "numero": "03",
+      "titulo": "Forma de pago y registro",
+      "voz": "Por último, cómo se pagan y qué hay que registrar."
+    },
+    {
+      "tipo": "puntos",
+      "titulo": "¿Cada mes o una vez al año?",
+      "items": [
+        {
+          "texto": "Regla general: cada mes, en el rol de pagos",
+          "icono": "wallet"
+        },
+        {
+          "texto": "Acumulado: solo si el trabajador lo pide por escrito",
+          "icono": "file-text"
+        },
+        {
+          "texto": "La solicitud se entrega en los primeros 15 días de enero",
+          "icono": "calendar-check"
+        },
+        {
+          "texto": "Rige los años siguientes, hasta que la cambie",
+          "icono": "clock"
+        }
+      ],
+      "voz": [
+        "Una duda muy común es si los décimos se pagan cada mes o una vez al año.",
+        "La regla general es que se pagan cada mes, junto con el sueldo. Por ejemplo, el décimo cuarto mensual en dos mil veintiséis es de cuarenta dólares con diecisiete centavos.",
+        "El pago acumulado solo aplica si el trabajador lo pide por escrito. Puede hacerlo para uno o para los dos décimos.",
+        "Esa solicitud se entrega en los primeros quince días de enero.",
+        "Y se mantiene los años siguientes, hasta que el trabajador decida cambiarla. Guarda siempre ese documento firmado en su expediente."
+      ]
+    },
+    {
+      "tipo": "puntos",
+      "titulo": "Lo que no puedes olvidar",
+      "items": [
+        {
+          "texto": "Registrar el pago en el SUT del Ministerio del Trabajo",
+          "icono": "landmark"
+        },
+        {
+          "texto": "Las fechas dependen del noveno dígito del RUC",
+          "icono": "calendar"
+        },
+        {
+          "texto": "Si alguien sale, los proporcionales van en su liquidación",
+          "icono": "log-out"
+        },
+        {
+          "texto": "Guardar los comprobantes de pago",
+          "icono": "shield-check"
+        }
+      ],
+      "voz": [
+        "Pagar no es suficiente. También hay que registrar.",
+        "El pago de los décimos se registra en el Sistema Único de Trabajo del Ministerio, dentro del cronograma que se publica cada año.",
+        "Ese cronograma depende del noveno dígito del Registro Único de Contribuyentes de la empresa, así que revisa qué fechas te tocan.",
+        "Si un trabajador sale antes de la fecha de pago, los valores proporcionales que tenga pendientes van en su liquidación.",
+        "Y guarda siempre los comprobantes: es lo primero que pide un inspector de trabajo."
+      ]
+    },
+    {
+      "tipo": "resumen",
+      "titulo": "En resumen",
+      "items": [
+        [
+          "Décimo tercero",
+          "Lo ganado de diciembre a noviembre, dividido para 12. Hasta el 24 de diciembre."
+        ],
+        [
+          "Décimo cuarto",
+          "Un sueldo básico, USD 482 en 2026, proporcional al tiempo y la jornada."
+        ],
+        [
+          "Por región",
+          "Costa y Galápagos: 15 de marzo. Sierra y Amazonía: 15 de agosto."
+        ],
+        [
+          "Forma de pago",
+          "Mensual, salvo que el trabajador pida por escrito el pago acumulado."
+        ]
+      ],
+      "voz": [
+        "Repasemos. El décimo tercero es lo ganado de diciembre a noviembre, dividido para doce, y se paga hasta el veinticuatro de diciembre.",
+        "El décimo cuarto es un sueldo básico, cuatrocientos ochenta y dos dólares, proporcional al tiempo trabajado y a la jornada.",
+        "Su fecha depende de la región: quince de marzo en la Costa y Galápagos, quince de agosto en la Sierra y la Amazonía.",
+        "Y los dos se pagan cada mes, salvo que el trabajador pida por escrito el pago acumulado. Ahora, comprueba lo que aprendiste con cuatro preguntas rápidas."
+      ]
+    },
+    {
+      "tipo": "pregunta",
+      "pregunta": "Luis gana USD 500 fijos al mes, trabajó todo el período y no tuvo horas extra. ¿Cuánto recibe de décimo tercero acumulado?",
+      "opciones": [
+        "USD 482",
+        "USD 500",
+        "USD 41,67",
+        "USD 600"
+      ],
+      "correcta": 1,
+      "explicacion": "500 × 12 = 6.000, y 6.000 ÷ 12 = 500. Si el sueldo no varió, el décimo tercero es igual a un sueldo mensual.",
+      "voz_pregunta": "Primera pregunta. Luis gana quinientos dólares fijos al mes, trabajó todo el período y no tuvo horas extra. ¿Cuánto recibe de décimo tercero acumulado?",
+      "voz_respuesta": "La respuesta es la B: quinientos dólares. Luis ganó seis mil dólares en el período, y seis mil para doce da quinientos. Cuando el sueldo no cambia, el décimo tercero es igual a un sueldo mensual."
+    },
+    {
+      "tipo": "pregunta",
+      "pregunta": "Una empresa en Guayaquil paga el décimo cuarto acumulado. ¿Cuál es la fecha límite?",
+      "opciones": [
+        "24 de diciembre",
+        "15 de marzo",
+        "15 de agosto",
+        "15 de abril"
+      ],
+      "correcta": 1,
+      "explicacion": "Guayaquil está en la Costa: el décimo cuarto se paga hasta el 15 de marzo.",
+      "voz_pregunta": "Segunda pregunta. Una empresa en Guayaquil paga el décimo cuarto acumulado. ¿Cuál es la fecha límite?",
+      "voz_respuesta": "Es la B: el quince de marzo, porque Guayaquil está en la Costa. El veinticuatro de diciembre es la fecha del décimo tercero."
+    },
+    {
+      "tipo": "pregunta",
+      "pregunta": "Ana trabaja en Cuenca desde el 1 de febrero de 2026 y pidió el décimo cuarto acumulado. ¿Cuánto recibe en agosto de 2026?",
+      "opciones": [
+        "USD 482",
+        "USD 40,17",
+        "USD 241",
+        "Nada"
+      ],
+      "correcta": 2,
+      "explicacion": "Cuenca está en la Sierra: período del 1 de agosto al 31 de julio. Trabajó 6 meses: 482 ÷ 12 × 6 = 241.",
+      "voz_pregunta": "Tercera pregunta. Ana trabaja en Cuenca desde el uno de febrero de dos mil veintiséis y pidió el décimo cuarto acumulado. ¿Cuánto recibe en agosto?",
+      "voz_respuesta": "Es la C: doscientos cuarenta y un dólares. Cuenca está en la Sierra, donde el período termina el treinta y uno de julio. Ana trabajó seis meses, así que recibe la parte proporcional."
+    },
+    {
+      "tipo": "pregunta",
+      "pregunta": "Un trabajador no presentó ninguna solicitud por escrito sobre sus décimos. ¿Cómo debe recibirlos?",
+      "opciones": [
+        "Acumulados, una vez al año",
+        "Cada mes, en el rol de pagos",
+        "Solo al salir de la empresa",
+        "Como decida el empleador"
+      ],
+      "correcta": 1,
+      "explicacion": "La regla general es el pago mensual. El pago acumulado solo aplica si el trabajador lo pide por escrito.",
+      "voz_pregunta": "Última pregunta. Un trabajador no presentó ninguna solicitud por escrito sobre sus décimos. ¿Cómo debe recibirlos?",
+      "voz_respuesta": "Es la B: cada mes, en el rol de pagos. El pago acumulado solo aplica cuando el trabajador lo pide por escrito. No es una decisión del empleador."
+    },
+    {
+      "tipo": "cierre",
+      "titulo": "Lección completada",
+      "texto": "En los recursos de esta lección tienes la plantilla para calcular los décimos.",
+      "voz": "Muy bien, terminaste esta lección. En los recursos tienes una plantilla para calcular los décimos de tu equipo. En la siguiente lección vamos a ver las horas suplementarias y extraordinarias."
+    }
+  ]
+}

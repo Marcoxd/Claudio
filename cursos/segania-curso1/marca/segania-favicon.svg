@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" role="img" aria-label="Segania">
+  <rect width="40" height="40" rx="9" fill="#0C447C"></rect>
+  <rect x="10" y="8" width="20" height="6" rx="3" fill="#FFFFFF"></rect>
+  <rect x="10" y="17" width="20" height="6" rx="3" fill="#FFFFFF"></rect>
+  <rect x="10" y="26" width="20" height="6" rx="3" fill="#FFFFFF"></rect>
+  <rect x="10" y="8" width="6" height="15" rx="3" fill="#FFFFFF"></rect>
+  <rect x="24" y="17" width="6" height="15" rx="3" fill="#FFFFFF"></rect>
+</svg>

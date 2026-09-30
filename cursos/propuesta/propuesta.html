@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Propuesta de cursos de Recursos Humanos</title>
+<link rel="stylesheet" href="fonts-local.css">
+<style>
+  @page { size: A4; margin: 0; }
+  :root {
+    --ink: #13212f;
+    --muted: #586878;
+    --line: #e2e7ee;
+    --paper: #ffffff;
+    --soft: #f5f7fa;
+    --navy: #0d2640;
+    --c1: #1d4f8c; --c1-soft: #e9f0f9;
+    --c2: #0e7a6b; --c2-soft: #e5f4f1;
+    --c3: #6a3cc2; --c3-soft: #f0ebfb;
+    --gold: #f2b441;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--paper); }
+  body {
+    font-family: 'Inter', 'Liberation Sans', sans-serif;
+    color: var(--ink);
+    font-size: 9.6pt;
+    line-height: 1.45;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  h1, h2, h3, .display { font-family: 'Montserrat', 'Liberation Sans', sans-serif; }
+
+  .page {
+    width: 210mm; height: 297mm;
+    position: relative; overflow: hidden;
+    padding: 15mm 16mm 19mm;
+    page-break-after: always;
+    break-after: page;
+  }
+  .page:last-child { page-break-after: auto; break-after: auto; }
+
+  .footer {
+    position: absolute; left: 16mm; right: 16mm; bottom: 8mm;
+    display: flex; justify-content: space-between;
+    font-size: 7.5pt; color: var(--muted);
+    border-top: 1px solid var(--line); padding-top: 3mm;
+  }
+
+  /* ---------- Portada ---------- */
+  .cover {
+    background: var(--navy);
+    color: #fff;
+    padding: 22mm 20mm;
+    display: flex; flex-direction: column;
+  }
+  .cover .deco {
+    position: absolute; right: -40mm; top: -30mm;
+    width: 150mm; height: 150mm; border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(242,180,65,.16), rgba(242,180,65,0) 62%);
+  }
+  .cover .deco2 {
+    position: absolute; left: -50mm; bottom: -60mm;
+    width: 170mm; height: 170mm; border-radius: 50%;
+    background: radial-gradient(circle at 60% 40%, rgba(106,60,194,.30), rgba(106,60,194,0) 65%);
+  }
+  .cover .brand { font-family: 'Montserrat'; font-weight: 700; letter-spacing: .08em; font-size: 10pt; text-transform: uppercase; color: var(--gold); position: relative; }
+  .cover .kicker { margin-top: 48mm; font-size: 10.5pt; letter-spacing: .12em; text-transform: uppercase; color: #b8c7d8; position: relative; }
+  .cover h1 { font-size: 34pt; line-height: 1.08; font-weight: 800; margin-top: 5mm; position: relative; }
+  .cover h1 span { color: var(--gold); }
+  .cover .lead { font-size: 12pt; color: #d5deea; margin-top: 7mm; max-width: 140mm; position: relative; line-height: 1.5; }
+  .cover .courses { margin-top: auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; position: relative; }
+  .cover .cc { border-radius: 3mm; padding: 5mm 5mm 5.5mm; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14); }
+  .cover .cc .n { font-family: 'Montserrat'; font-weight: 800; font-size: 9pt; letter-spacing: .08em; }
+  .cover .cc .t { font-family: 'Montserrat'; font-weight: 700; font-size: 10.5pt; line-height: 1.3; margin-top: 2mm; }
+  .cover .cc.k1 .n { color: #8fb8ec; } .cover .cc.k2 .n { color: #6fd3c2; } .cover .cc.k3 .n { color: #c3a8f2; }
+  .cover .meta { margin-top: 10mm; display: flex; justify-content: space-between; font-size: 9pt; color: #b8c7d8; position: relative; border-top: 1px solid rgba(255,255,255,.15); padding-top: 4mm; }
+
+  /* ---------- Genérico ---------- */
+  .eyebrow { font-size: 8pt; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  h2.section { font-size: 20pt; font-weight: 800; margin-top: 2mm; line-height: 1.15; }
+  p.intro { font-size: 10.5pt; color: #33475b; margin-top: 4mm; max-width: 165mm; }
+  h3.sub { font-size: 11.5pt; font-weight: 700; margin: 6mm 0 2.6mm; }
+
+  /* Resumen: tarjetas de cursos */
+  .overview { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; margin-top: 5.5mm; }
+  .ov { border: 1px solid var(--line); border-radius: 3mm; overflow: hidden; display: flex; flex-direction: column; }
+  .ov .top { padding: 4.5mm 4.5mm 4mm; color: #fff; }
+  .ov.k1 .top { background: var(--c1); } .ov.k2 .top { background: var(--c2); } .ov.k3 .top { background: var(--c3); }
+  .ov .top .n { font-size: 7.5pt; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; opacity: .85; }
+  .ov .top .t { font-family: 'Montserrat'; font-weight: 700; font-size: 10.5pt; line-height: 1.28; margin-top: 1.5mm; min-height: 14mm; }
+  .ov .body { padding: 4mm 4.5mm 4.5mm; font-size: 8.8pt; display: flex; flex-direction: column; gap: 2.6mm; flex: 1; }
+  .ov .lbl { font-size: 7pt; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .ov .stat { margin-top: auto; padding-top: 3mm; border-top: 1px solid var(--line); font-weight: 600; font-size: 8.6pt; }
+  .ov.k1 .stat { color: var(--c1); } .ov.k2 .stat { color: var(--c2); } .ov.k3 .stat { color: var(--c3); }
+
+  .why { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; }
+  .why .item { display: flex; gap: 2.5mm; align-items: flex-start; background: var(--soft); border-radius: 2.5mm; padding: 3.2mm 3.5mm; }
+  .why .dot { flex: none; width: 2.2mm; height: 2.2mm; border-radius: 50%; background: var(--gold); margin-top: 1.6mm; }
+  .why b { display: block; font-weight: 600; font-size: 9pt; line-height: 1.3; }
+  .why span { color: var(--muted); font-size: 8.4pt; line-height: 1.4; display: block; margin-top: .6mm; }
+
+  .route { display: flex; align-items: stretch; gap: 0; margin-top: 1mm; }
+  .route .step { flex: 1; border: 1px solid var(--line); border-radius: 2.5mm; padding: 3.5mm 4mm; }
+  .route .step .s { font-size: 7.2pt; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .route .step .t { font-weight: 600; margin-top: 1mm; }
+  .route .step .d { color: var(--muted); font-size: 8.5pt; margin-top: .8mm; }
+  .route .arrow { flex: none; width: 8mm; display: flex; align-items: center; justify-content: center; color: #9aa9b8; font-size: 13pt; }
+  .route .k1 .s { color: var(--c1); } .route .k2 .s { color: var(--c2); } .route .k3 .s { color: var(--c3); }
+  .note-small { font-size: 8.5pt; color: var(--muted); margin-top: 3mm; }
+
+  /* ---------- Páginas de curso ---------- */
+  .band { margin: -15mm -16mm 0; padding: 12mm 16mm 7.5mm; color: #fff; position: relative; overflow: hidden; }
+  .band::after { content: ""; position: absolute; right: -25mm; top: -35mm; width: 90mm; height: 90mm; border-radius: 50%; background: rgba(255,255,255,.08); }
+  .k1 .band { background: var(--c1); } .k2 .band { background: var(--c2); } .k3 .band { background: var(--c3); }
+  .band .n { font-size: 8pt; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; opacity: .85; }
+  .band h2 { font-size: 19pt; font-weight: 800; line-height: 1.12; margin-top: 2mm; max-width: 160mm; }
+  .band p { font-size: 9.6pt; margin-top: 2.5mm; max-width: 160mm; opacity: .93; }
+
+  .facts { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 4mm; margin-top: 5mm; font-size: 9pt; }
+  .fact { border-radius: 2.5mm; padding: 3.2mm 4mm; }
+  .k1 .fact { background: var(--c1-soft); } .k2 .fact { background: var(--c2-soft); } .k3 .fact { background: var(--c3-soft); }
+  .fact .lbl { font-size: 7.2pt; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 1.5mm; }
+  .k1 .fact .lbl { color: var(--c1); } .k2 .fact .lbl { color: var(--c2); } .k3 .fact .lbl { color: var(--c3); }
+  .fact ul { list-style: none; }
+  .fact li { position: relative; padding-left: 4mm; margin-top: .5mm; }
+  .fact li::before { content: "✓"; position: absolute; left: 0; font-weight: 700; }
+  .k1 .fact li::before { color: var(--c1); } .k2 .fact li::before { color: var(--c2); } .k3 .fact li::before { color: var(--c3); }
+
+  .mods-title { display: flex; align-items: baseline; justify-content: space-between; margin: 5.5mm 0 2.6mm; }
+  .mods-title h3 { font-size: 12pt; font-weight: 700; }
+  .mods-title span { font-size: 8.5pt; color: var(--muted); }
+
+  .mods { display: flex; flex-direction: column; gap: 2.8mm; }
+  .mod { display: grid; grid-template-columns: 10mm 1fr; gap: 4mm; border: 1px solid var(--line); border-radius: 2.5mm; padding: 3.6mm 4.5mm 3.8mm 4mm; break-inside: avoid; }
+  .num { width: 9mm; height: 9mm; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Montserrat'; font-weight: 800; font-size: 10pt; color: #fff; }
+  .k1 .num { background: var(--c1); } .k2 .num { background: var(--c2); } .k3 .num { background: var(--c3); }
+  .mod h4 { font-family: 'Montserrat'; font-size: 10.2pt; font-weight: 700; line-height: 1.3; margin-top: .6mm; }
+  .mod ul { list-style: none; margin-top: 1.4mm; }
+  .mod li { position: relative; padding-left: 3.6mm; margin-top: .7mm; color: #2f4254; }
+  .mod li::before { content: ""; position: absolute; left: 0; top: 1.9mm; width: 1.4mm; height: 1.4mm; border-radius: 50%; background: #9aa9b8; }
+  .tags { display: flex; flex-wrap: wrap; gap: 1.5mm; margin-top: 2mm; }
+  .tag { font-size: 7.3pt; font-weight: 600; padding: .6mm 2.2mm; border-radius: 10mm; }
+  .k1 .tag { background: var(--c1-soft); color: var(--c1); } .k2 .tag { background: var(--c2-soft); color: var(--c2); } .k3 .tag { background: var(--c3-soft); color: var(--c3); }
+
+  .mods.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.8mm; }
+  .mods.grid .mod { grid-template-columns: 8mm 1fr; gap: 3mm; padding: 3.2mm 3.8mm 3.4mm 3.4mm; }
+  .mods.grid .num { width: 7.5mm; height: 7.5mm; font-size: 8.8pt; }
+  .mods.grid .mod h4 { font-size: 9.4pt; margin-top: .4mm; }
+  .mods.grid .mod li { font-size: 8.6pt; line-height: 1.38; }
+  .mods.grid .tags { margin-top: 1.6mm; }
+  .mods.grid .mod.wide { grid-column: 1 / -1; }
+  .mods.grid .mod.hl { border-color: #cdbdf0; background: #faf8fe; }
+
+  /* ---------- Marco normativo ---------- */
+  table.norms { width: 100%; border-collapse: collapse; margin-top: 4mm; font-size: 8.4pt; }
+  table.norms th { text-align: left; font-size: 7.2pt; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 700; padding: 0 3mm 2mm 0; border-bottom: 1.5px solid var(--ink); }
+  table.norms td { padding: 1.5mm 3mm 1.5mm 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.norms td:first-child { font-weight: 600; width: 46%; }
+  table.norms td:last-child { width: 11%; white-space: nowrap; }
+  .pill { display: inline-block; font-size: 7.2pt; font-weight: 700; padding: .3mm 2mm; border-radius: 10mm; margin-right: 1mm; color: #fff; }
+  .pill.p1 { background: var(--c1); } .pill.p2 { background: var(--c2); } .pill.p3 { background: var(--c3); }
+
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; margin-top: 5mm; }
+  .box { border-radius: 3mm; padding: 4mm 4.5mm; }
+  .box.data { background: var(--navy); color: #fff; }
+  .box.data .lbl { color: var(--gold); }
+  .box .lbl { font-size: 7.3pt; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 2.5mm; }
+  .kv { display: flex; justify-content: space-between; gap: 3mm; padding: 1.4mm 0; border-bottom: 1px solid rgba(255,255,255,.13); font-size: 8.5pt; }
+  .kv:last-child { border-bottom: none; }
+  .kv b { font-weight: 600; text-align: right; white-space: nowrap; }
+  .box.steps { background: var(--soft); }
+  .box.steps .lbl { color: var(--muted); }
+  .box.steps ol { list-style: none; counter-reset: s; }
+  .box.steps li { counter-increment: s; position: relative; padding-left: 7mm; margin-top: 1.8mm; font-size: 9pt; }
+  .box.steps li::before { content: counter(s); position: absolute; left: 0; top: .1mm; width: 4.8mm; height: 4.8mm; border-radius: 50%; background: var(--ink); color: #fff; font-size: 7.2pt; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .box.steps li b { font-weight: 600; }
+  .box.steps li span { color: var(--muted); font-size: 8.6pt; }
+
+  .warn { margin-top: 4.5mm; border-left: 3px solid var(--gold); background: #fdf6e7; padding: 3.5mm 4.5mm; border-radius: 0 2.5mm 2.5mm 0; font-size: 8.8pt; color: #4a3b17; }
+  .sources { margin-top: 4mm; font-size: 7.4pt; color: var(--muted); line-height: 1.5; }
+  .sources b { color: var(--ink); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- ================= PORTADA ================= -->
+<section class="page cover">
+  <div class="deco"></div><div class="deco2"></div>
+  <div class="brand">segania.com</div>
+  <div class="kicker">Propuesta de formación · Talento humano</div>
+  <h1>Cursos de Recursos Humanos <span>para Ecuador</span></h1>
+  <p class="lead">Tres cursos prácticos, alineados con el Código del Trabajo y la normativa laboral vigente en 2026, para empresas, emprendedores y profesionales de talento humano.</p>
+
+  <div class="courses">
+    <div class="cc k1"><div class="n">CURSO 1</div><div class="t">Gestión laboral y cumplimiento legal en Ecuador</div></div>
+    <div class="cc k2"><div class="n">CURSO 2</div><div class="t">Ambientes de trabajo seguros y desarrollo del talento</div></div>
+    <div class="cc k3"><div class="n">CURSO 3</div><div class="t">Inteligencia Artificial aplicada a Recursos Humanos</div></div>
+  </div>
+  <div class="meta"><span>Normativa actualizada a septiembre de 2026</span><span>3 cursos · 18 módulos + proyecto final</span></div>
+</section>
+
+<!-- ================= RESUMEN ================= -->
+<section class="page">
+  <div class="eyebrow">Resumen de la propuesta</div>
+  <h2 class="section">Tres cursos, un mismo objetivo: gestionar personas bien y dentro de la ley</h2>
+  <p class="intro">Los dos primeros cursos recorren la gestión del talento humano con enfoque legal ecuatoriano: desde la contratación hasta la liquidación, y desde la seguridad en el trabajo hasta el desarrollo del equipo. El tercero es un curso independiente para aplicar inteligencia artificial en el área de RRHH.</p>
+
+  <div class="overview">
+    <div class="ov k1">
+      <div class="top"><div class="n">Curso 1</div><div class="t">Gestión laboral y cumplimiento legal en Ecuador</div></div>
+      <div class="body">
+        <div><div class="lbl">Enfoque</div>Ciclo legal completo del trabajador: contrato, nómina, jornada y salida.</div>
+        <div><div class="lbl">Dirigido a</div>Talento humano, dueños de pymes, contadores y asistentes de nómina.</div>
+        <div class="stat">5 módulos</div>
+      </div>
+    </div>
+    <div class="ov k2">
+      <div class="top"><div class="n">Curso 2</div><div class="t">Ambientes de trabajo seguros y desarrollo del talento</div></div>
+      <div class="body">
+        <div><div class="lbl">Enfoque</div>Obligaciones de prevención (seguridad, acoso, datos) y desarrollo del equipo.</div>
+        <div><div class="lbl">Dirigido a</div>Talento humano, jefes y gerentes, técnicos de seguridad y salud.</div>
+        <div class="stat">5 módulos</div>
+      </div>
+    </div>
+    <div class="ov k3">
+      <div class="top"><div class="n">Curso 3</div><div class="t">Inteligencia Artificial aplicada a Recursos Humanos</div></div>
+      <div class="body">
+        <div><div class="lbl">Enfoque</div>Herramientas de IA en cada proceso de RRHH, con su marco legal y ético.</div>
+        <div><div class="lbl">Dirigido a</div>RRHH, dueños de negocio, gerentes y emprendedores. Sin requisitos técnicos.</div>
+        <div class="stat">8 módulos + proyecto final</div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sub">¿Por qué ahora?</h3>
+  <div class="why">
+    <div class="item"><div class="dot"></div><div><b>Nuevo sueldo básico 2026: USD 482</b><span>Cambia el cálculo de décimos, aportes y liquidaciones.</span></div></div>
+    <div class="item"><div class="dot"></div><div><b>Protocolo obligatorio contra el acoso</b><span>Acuerdos MDT-2025-102 y MDT-2025-186 para el sector privado.</span></div></div>
+    <div class="item"><div class="dot"></div><div><b>Nuevas reglas de jornada y turnos</b><span>Acuerdo MDT-2026-059 (marzo 2026): turnos especiales y jornadas flexibles.</span></div></div>
+    <div class="item"><div class="dot"></div><div><b>Nuevo reglamento de seguridad y salud</b><span>Decreto Ejecutivo 255: obligaciones según el tamaño de la empresa.</span></div></div>
+    <div class="item"><div class="dot"></div><div><b>Primera norma sobre IA y datos personales</b><span>Resolución SPDP-SPD-2026-0009-R (febrero 2026).</span></div></div>
+    <div class="item"><div class="dot"></div><div><b>Más control del Ministerio del Trabajo</b><span>Registro en el SUT y nuevas reglas de inspección (MDT-2025-053).</span></div></div>
+  </div>
+
+  <h3 class="sub">Ruta de aprendizaje sugerida</h3>
+  <div class="route">
+    <div class="step k3"><div class="s">Entrada</div><div class="t">Curso 3 · IA para RRHH</div><div class="d">El de público más amplio: atrae alumnos nuevos.</div></div>
+    <div class="arrow">→</div>
+    <div class="step k1"><div class="s">Base legal</div><div class="t">Curso 1 · Gestión laboral</div><div class="d">Lo que toda empresa debe cumplir.</div></div>
+    <div class="arrow">→</div>
+    <div class="step k2"><div class="s">Especialización</div><div class="t">Curso 2 · Ambientes seguros</div><div class="d">Prevención y desarrollo del equipo.</div></div>
+  </div>
+  <p class="note-small">Los tres cursos se pueden tomar por separado. La ruta es una sugerencia para vender los cursos en paquete.</p>
+
+  <div class="footer"><span>Propuesta de cursos de Recursos Humanos · segania.com</span><span>2</span></div>
+</section>
+
+<!-- ================= CURSO 1 ================= -->
+<section class="page k1">
+  <div class="band">
+    <div class="n">Curso 1</div>
+    <h2>Gestión laboral y cumplimiento legal en Ecuador</h2>
+    <p>Todo el ciclo legal de la relación laboral, desde la contratación hasta la liquidación, según el Código del Trabajo y la normativa vigente en 2026.</p>
+  </div>
+
+  <div class="facts">
+    <div class="fact">
+      <div class="lbl">Dirigido a</div>
+      Responsables de talento humano, dueños de negocios y pymes, contadores y asistentes de nómina.
+    </div>
+    <div class="fact">
+      <div class="lbl">Al terminar, el participante podrá</div>
+      <ul>
+        <li>Contratar y registrar trabajadores cumpliendo la ley.</li>
+        <li>Calcular correctamente la nómina, los beneficios de ley y los aportes.</li>
+        <li>Gestionar la salida de un trabajador y su liquidación sin riesgos legales.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="mods-title"><h3>Módulos</h3><span>5 módulos</span></div>
+  <div class="mods grid">
+    <div class="mod"><div class="num">1</div><div>
+      <h4>Marco legal laboral del Ecuador</h4>
+      <ul>
+        <li>Constitución, Código del Trabajo, Ley de Seguridad Social y acuerdos ministeriales.</li>
+        <li>Instituciones: Ministerio del Trabajo, sistema SUT, IESS, SRI e inspectores de trabajo.</li>
+        <li>Reformas recientes: trabajo remunerado del hogar (2025) y control de obligaciones del empleador.</li>
+      </ul>
+      <div class="tags"><span class="tag">Código del Trabajo</span><span class="tag">MDT-2025-053</span></div>
+    </div></div>
+    <div class="mod"><div class="num">2</div><div>
+      <h4>Reclutamiento, selección y contratación legal</h4>
+      <ul>
+        <li>Tipos de contrato y período de prueba de hasta 90 días.</li>
+        <li>Afiliación al IESS desde el primer día y registro del contrato en el SUT (30 días).</li>
+        <li>Inclusión laboral: 4% de personas con discapacidad en empresas con 25 trabajadores o más.</li>
+        <li>No discriminación e igualdad salarial en la contratación.</li>
+      </ul>
+      <div class="tags"><span class="tag">Art. 15</span><span class="tag">Art. 42 num. 33</span></div>
+    </div></div>
+    <div class="mod"><div class="num">3</div><div>
+      <h4>Nómina, remuneraciones y beneficios de ley</h4>
+      <ul>
+        <li>Sueldo básico 2026 (USD 482), décimo tercero y décimo cuarto según la región.</li>
+        <li>Fondos de reserva, aportes al IESS (9,45% trabajador / 12,15% empleador) y utilidades (15%).</li>
+        <li>Igualdad de remuneración entre mujeres y hombres.</li>
+      </ul>
+      <div class="tags"><span class="tag">MDT-2025-195</span><span class="tag">Ley de Igualdad Salarial</span></div>
+    </div></div>
+    <div class="mod"><div class="num">4</div><div>
+      <h4>Jornada, horarios, vacaciones y licencias</h4>
+      <ul>
+        <li>Jornada de 8 horas y 40 semanales; horas suplementarias (50%), extraordinarias (100%) y nocturnas (25%).</li>
+        <li>Turnos especiales y jornadas flexibles.</li>
+        <li>Vacaciones, maternidad, paternidad y lactancia. Teletrabajo y derecho a la desconexión.</li>
+      </ul>
+      <div class="tags"><span class="tag">MDT-2026-059</span><span class="tag">Art. 16.1</span></div>
+    </div></div>
+    <div class="mod wide"><div class="num">5</div><div>
+      <h4>Terminación laboral y liquidaciones</h4>
+      <ul>
+        <li>Renuncia y desahucio: bonificación del 25% por cada año trabajado.</li>
+        <li>Despido intempestivo, despido ineficaz y visto bueno ante el inspector de trabajo.</li>
+        <li>Cálculo de la liquidación y registro del acta de finiquito en el SUT.</li>
+      </ul>
+      <div class="tags"><span class="tag">Arts. 172–173</span><span class="tag">Art. 185</span><span class="tag">Art. 188</span></div>
+    </div></div>
+  </div>
+
+  <div class="footer"><span>Propuesta de cursos de Recursos Humanos · segania.com</span><span>3</span></div>
+</section>
+
+<!-- ================= CURSO 2 ================= -->
+<section class="page k2">
+  <div class="band">
+    <div class="n">Curso 2</div>
+    <h2>Ambientes de trabajo seguros y desarrollo del talento</h2>
+    <p>Las obligaciones de prevención más recientes (seguridad y salud, acoso laboral y protección de datos) junto con las herramientas para integrar, evaluar y desarrollar al personal.</p>
+  </div>
+
+  <div class="facts">
+    <div class="fact">
+      <div class="lbl">Dirigido a</div>
+      Talento humano, jefes y gerentes de área, técnicos de seguridad y salud, y emprendedores con equipos.
+    </div>
+    <div class="fact">
+      <div class="lbl">Al terminar, el participante podrá</div>
+      <ul>
+        <li>Implementar los reglamentos y protocolos obligatorios según el tamaño de la empresa.</li>
+        <li>Prevenir y atender casos de acoso y riesgos psicosociales.</li>
+        <li>Evaluar y desarrollar al equipo con respaldo documental.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="mods-title"><h3>Módulos</h3><span>5 módulos</span></div>
+  <div class="mods grid">
+    <div class="mod"><div class="num">1</div><div>
+      <h4>Onboarding y reglamentos internos</h4>
+      <ul>
+        <li>Diseño del proceso de inducción de nuevos trabajadores.</li>
+        <li>Reglamento interno de trabajo aprobado por el Ministerio del Trabajo.</li>
+        <li>Reglamento de higiene y seguridad registrado en el SUT y socialización de protocolos.</li>
+      </ul>
+      <div class="tags"><span class="tag">Art. 64</span></div>
+    </div></div>
+    <div class="mod"><div class="num">2</div><div>
+      <h4>Seguridad y salud en el trabajo</h4>
+      <ul>
+        <li>Política de seguridad y salud y matriz de riesgos (IPER).</li>
+        <li>Obligaciones según tamaño: delegado de seguridad (10 a 49 trabajadores), comité paritario (50 o más).</li>
+        <li>Unidad de seguridad y salud con médico ocupacional (100 o más, o riesgo alto).</li>
+      </ul>
+      <div class="tags"><span class="tag">Decreto Ejecutivo 255</span></div>
+    </div></div>
+    <div class="mod"><div class="num">3</div><div>
+      <h4>Acoso laboral, clima y riesgos psicosociales</h4>
+      <ul>
+        <li>Protocolo interno contra la discriminación, la violencia y el acoso, registrado ante el Ministerio.</li>
+        <li>Programa de prevención de riesgos psicosociales (empresas con más de 10 trabajadores).</li>
+        <li>Capacitación obligatoria a jefaturas y encuestas de clima laboral.</li>
+      </ul>
+      <div class="tags"><span class="tag">MDT-2025-102</span><span class="tag">MDT-2025-186</span></div>
+    </div></div>
+    <div class="mod"><div class="num">4</div><div>
+      <h4>Evaluación del desempeño, capacitación y liderazgo</h4>
+      <ul>
+        <li>Objetivos, retroalimentación y planes de desarrollo individual.</li>
+        <li>Cómo documentar el desempeño para que tenga respaldo legal.</li>
+        <li>Valoración de puestos para la igualdad salarial. Liderazgo y manejo de conflictos.</li>
+      </ul>
+      <div class="tags"><span class="tag">Art. 172</span><span class="tag">Ley de Igualdad Salarial</span></div>
+    </div></div>
+    <div class="mod wide"><div class="num">5</div><div>
+      <h4>Protección de datos del personal</h4>
+      <ul>
+        <li>Expedientes del personal, datos de salud y videovigilancia.</li>
+        <li>Consentimiento, conservación de la información y derechos de los trabajadores.</li>
+      </ul>
+      <div class="tags"><span class="tag">Ley Orgánica de Protección de Datos Personales</span></div>
+    </div></div>
+  </div>
+
+  <div class="footer"><span>Propuesta de cursos de Recursos Humanos · segania.com</span><span>4</span></div>
+</section>
+
+<!-- ================= CURSO 3 ================= -->
+<section class="page k3">
+  <div class="band">
+    <div class="n">Curso 3 · Curso independiente</div>
+    <h2>Inteligencia Artificial aplicada a Recursos Humanos</h2>
+    <p>Uso práctico de herramientas de IA generativa en cada proceso de talento humano, con el marco legal y ético vigente en Ecuador.</p>
+  </div>
+
+  <div class="facts">
+    <div class="fact">
+      <div class="lbl">Dirigido a</div>
+      Profesionales de RRHH, dueños de negocio, gerentes y emprendedores. No requiere conocimientos técnicos.
+    </div>
+    <div class="fact">
+      <div class="lbl">Al terminar, el participante podrá</div>
+      <ul>
+        <li>Usar IA para ahorrar tiempo en reclutamiento, capacitación y gestión.</li>
+        <li>Revisar con criterio lo que produce la IA antes de usarlo.</li>
+        <li>Implementar IA en su empresa cumpliendo la protección de datos.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="mods-title"><h3>Módulos</h3><span>8 módulos + proyecto final</span></div>
+  <div class="mods grid">
+    <div class="mod"><div class="num">1</div><div>
+      <h4>Fundamentos de IA para RRHH</h4>
+      <ul><li>Qué es y qué no es la IA generativa.</li><li>ChatGPT, Claude, Gemini y Copilot.</li><li>Cómo escribir buenos prompts.</li></ul>
+    </div></div>
+    <div class="mod"><div class="num">2</div><div>
+      <h4>IA en reclutamiento y selección</h4>
+      <ul><li>Redactar perfiles de puesto y vacantes.</li><li>Filtrar hojas de vida con supervisión humana.</li><li>Guías de entrevista por competencias.</li></ul>
+    </div></div>
+    <div class="mod"><div class="num">3</div><div>
+      <h4>IA para onboarding y capacitación</h4>
+      <ul><li>Manuales de inducción.</li><li>Microcursos para el personal.</li><li>Asistentes de preguntas frecuentes.</li></ul>
+    </div></div>
+    <div class="mod"><div class="num">4</div><div>
+      <h4>IA para desempeño y clima laboral</h4>
+      <ul><li>Redactar objetivos y retroalimentación.</li><li>Analizar encuestas de clima laboral.</li></ul>
+    </div></div>
+    <div class="mod"><div class="num">5</div><div>
+      <h4>IA para la gestión laboral ecuatoriana</h4>
+      <ul><li>Cálculo de décimos, vacaciones y liquidaciones.</li><li>Consultas al Código del Trabajo.</li><li>Cómo verificar lo que responde la IA.</li></ul>
+    </div></div>
+    <div class="mod"><div class="num">6</div><div>
+      <h4>Análisis de datos de personal</h4>
+      <ul><li>Rotación y ausentismo.</li><li>Tableros de indicadores de talento humano.</li></ul>
+    </div></div>
+    <div class="mod"><div class="num">7</div><div>
+      <h4>Automatización de tareas repetitivas</h4>
+      <ul><li>Formularios y correos.</li><li>Agendamiento de entrevistas.</li><li>Reportes automáticos.</li></ul>
+    </div></div>
+    <div class="mod hl"><div class="num">8</div><div>
+      <h4>Marco legal y ética de la IA en Ecuador</h4>
+      <ul><li>Datos personales, consentimiento y decisiones automatizadas (Art. 20).</li><li>Resolución SPDP-SPD-2026-0009-R.</li><li>Sesgos, no discriminación y política de uso de IA.</li></ul>
+    </div></div>
+    <div class="mod wide"><div class="num">9</div><div>
+      <h4>Proyecto final: plan de implementación</h4>
+      <ul><li>Cada participante diseña un plan para usar IA en el área de talento humano de su propia empresa.</li></ul>
+    </div></div>
+  </div>
+
+  <div class="footer"><span>Propuesta de cursos de Recursos Humanos · segania.com</span><span>5</span></div>
+</section>
+
+<!-- ================= MARCO NORMATIVO ================= -->
+<section class="page">
+  <div class="eyebrow">Anexo</div>
+  <h2 class="section">Marco normativo de referencia</h2>
+  <p class="intro">Normas ecuatorianas que se trabajan en los cursos y en qué curso aparece cada una.</p>
+
+  <table class="norms">
+    <thead><tr><th>Norma</th><th>Qué regula</th><th>Curso</th></tr></thead>
+    <tbody>
+      <tr><td>Constitución de la República</td><td>Derechos del trabajo y no discriminación</td><td><span class="pill p1">1</span></td></tr>
+      <tr><td>Código del Trabajo</td><td>Contratos, jornada, beneficios y terminación</td><td><span class="pill p1">1</span><span class="pill p2">2</span></td></tr>
+      <tr><td>Ley de Seguridad Social</td><td>Afiliación y aportes al IESS</td><td><span class="pill p1">1</span></td></tr>
+      <tr><td>Ley Orgánica para la Igualdad Salarial entre Mujeres y Hombres (2024)</td><td>Igual pago por trabajo de igual valor</td><td><span class="pill p1">1</span><span class="pill p2">2</span></td></tr>
+      <tr><td>Acuerdo Ministerial MDT-2025-195</td><td>Sueldo básico 2026: USD 482</td><td><span class="pill p1">1</span></td></tr>
+      <tr><td>Acuerdo Ministerial MDT-2025-053</td><td>Control de obligaciones del empleador e inspecciones</td><td><span class="pill p1">1</span></td></tr>
+      <tr><td>Reforma al Código del Trabajo sobre trabajo del hogar (2025)</td><td>Trabajo remunerado del hogar</td><td><span class="pill p1">1</span></td></tr>
+      <tr><td>Acuerdo Ministerial MDT-2026-059</td><td>Turnos especiales y distribución de la jornada</td><td><span class="pill p1">1</span></td></tr>
+      <tr><td>Decreto Ejecutivo 255 (2024)</td><td>Reglamento de Seguridad y Salud en el Trabajo</td><td><span class="pill p2">2</span></td></tr>
+      <tr><td>Acuerdos Ministeriales MDT-2025-102 y MDT-2025-186</td><td>Discriminación, violencia, acoso y riesgos psicosociales</td><td><span class="pill p2">2</span></td></tr>
+      <tr><td>Ley Orgánica de Protección de Datos Personales (2021) y su reglamento</td><td>Tratamiento de datos de trabajadores y candidatos</td><td><span class="pill p2">2</span><span class="pill p3">3</span></td></tr>
+      <tr><td>Resolución SPDP-SPD-2026-0009-R</td><td>Datos personales en sistemas de inteligencia artificial</td><td><span class="pill p3">3</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="two">
+    <div class="box data">
+      <div class="lbl">Datos clave 2026</div>
+      <div class="kv"><span>Sueldo básico unificado</span><b>USD 482</b></div>
+      <div class="kv"><span>Décimo tercero (pago hasta)</span><b>24 de diciembre</b></div>
+      <div class="kv"><span>Décimo cuarto · Costa y Galápagos</span><b>15 de marzo</b></div>
+      <div class="kv"><span>Décimo cuarto · Sierra y Amazonía</span><b>15 de agosto</b></div>
+      <div class="kv"><span>Utilidades 15% (pago hasta)</span><b>15 de abril</b></div>
+      <div class="kv"><span>Aportes IESS trabajador / empleador</span><b>9,45% / 12,15%</b></div>
+    </div>
+    <div class="box steps">
+      <div class="lbl">Próximos pasos</div>
+      <ol>
+        <li><b>Aprobar la estructura</b><br><span>Validar los 3 cursos y sus módulos.</span></li>
+        <li><b>Desarrollar el temario detallado</b><br><span>Lecciones, duración, actividades y evaluaciones.</span></li>
+        <li><b>Revisión legal</b><br><span>Validación por un abogado laboralista.</span></li>
+        <li><b>Producción y lanzamiento</b><br><span>Materiales, recursos y publicación en la plataforma.</span></li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="warn"><b>Importante:</b> la normativa está actualizada a septiembre de 2026. Los acuerdos ministeriales y los valores (como el sueldo básico) cambian con frecuencia, por lo que se recomienda revisar el contenido legal antes de cada nueva edición de los cursos. Ecuador aún no tiene una ley integral de inteligencia artificial; hay proyectos en trámite en la Asamblea Nacional.</div>
+
+  <div class="sources"><b>Fuentes consultadas:</b> Ministerio del Trabajo (trabajo.gob.ec), Registro Oficial vía Lexis (lexis.com.ec), Superintendencia de Protección de Datos Personales (spdp.gob.ec), Asamblea Nacional (asambleanacional.gob.ec).</div>
+
+  <div class="footer"><span>Propuesta de cursos de Recursos Humanos · segania.com</span><span>6</span></div>
+</section>
+
+</body>
+</html>
