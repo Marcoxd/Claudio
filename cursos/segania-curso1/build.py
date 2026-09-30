@@ -38,23 +38,26 @@ def ic(name, cls="ico"):
 # ======================================================================= diseño
 CSS = """
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--paper:#f6f4ef;--ink:#111c2b;--muted:#5f6b7a;--line:#e2ded5;--navy:#0f2742;--navy2:#153459;
---blue:#1f4f8a;--gold:#e0a526;--gold2:#f3d9a0;--ok:#0f7a4c;--no:#b5473a;
+:root{--paper:#F1EFE8;--ink:#2C2C2A;--muted:#5A5A58;--ink3:#9A9A98;--line:#DDD9D0;--line2:#EDEAE3;--navy:#0C447C;--navy2:#185FA5;
+--blue:#185FA5;--sky:#B5D4F4;--gold:#1D9E75;--gold2:#9FE1CB;--ok:#1D9E75;--no:#B4493B;
 --ease:cubic-bezier(.16,1,.3,1)}
 @property --n{syntax:'<integer>';inherits:false;initial-value:0}
 html,body{width:1920px;height:1080px;overflow:hidden}
-body{font-family:'Inter',sans-serif;color:var(--ink);background:var(--paper);position:relative;-webkit-font-smoothing:antialiased}
-body.dark{background:var(--navy);color:#fff}
-h1,h2,h3,.m{font-family:'Montserrat',sans-serif;letter-spacing:-.015em}
+body{font-family:'IBM Plex Sans',sans-serif;color:var(--ink);background:var(--paper);position:relative;-webkit-font-smoothing:antialiased}
+body.dark{background:var(--navy);color:#fff;--gold:#9FE1CB;--line:rgba(255,255,255,.18)}
+h1,h2,h3,.m{font-family:'Archivo',sans-serif;letter-spacing:-.025em}
+.mono{font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.18em}
 svg.lucide{width:1em;height:1em;stroke-width:1.75}
 
 /* fondo vivo: manchas de color que se desplazan muy despacio + grano */
 .bg{position:absolute;inset:0;overflow:hidden;z-index:0}
-.blob{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55}
-.b1{width:900px;height:900px;left:-250px;top:-350px;background:#f1dfb5;animation:drift1 60s linear infinite}
-.b2{width:1000px;height:1000px;right:-350px;bottom:-500px;background:#d7e2f0;animation:drift2 70s linear infinite}
-body.dark .b1{background:#274b7a;opacity:.6}
-body.dark .b2{background:#6b5320;opacity:.35}
+.blob{position:absolute;border-radius:50%;filter:blur(110px);opacity:.28}
+.bg::after{content:'';position:absolute;inset:0;background-image:radial-gradient(rgba(12,68,124,.10) 1.6px,transparent 1.8px);background-size:34px 34px}
+body.dark .bg::after{background-image:radial-gradient(rgba(255,255,255,.07) 1.6px,transparent 1.8px)}
+.b1{width:900px;height:900px;left:-250px;top:-350px;background:#B5D4F4;animation:drift1 60s linear infinite}
+.b2{width:1000px;height:1000px;right:-350px;bottom:-500px;background:#9FE1CB;animation:drift2 70s linear infinite}
+body.dark .b1{background:#185FA5;opacity:.55}
+body.dark .b2{background:#1D9E75;opacity:.22}
 @keyframes drift1{0%{transform:translate(0,0)}50%{transform:translate(260px,140px)}100%{transform:translate(0,0)}}
 @keyframes drift2{0%{transform:translate(0,0)}50%{transform:translate(-240px,-120px)}100%{transform:translate(0,0)}}
 .grain{position:absolute;inset:-100px;background:url(GRAIN) repeat;opacity:.07;z-index:40;pointer-events:none;}
@@ -67,12 +70,12 @@ body.dark .grain{opacity:.1}
 .stage{position:absolute;left:150px;right:150px;top:120px;bottom:130px;display:flex;flex-direction:column;justify-content:center}
 
 /* marca */
-.bug{position:absolute;left:150px;bottom:54px;z-index:30;font-size:21px;color:var(--muted);display:flex;gap:14px;align-items:center;letter-spacing:.02em}
+.bug{position:absolute;left:150px;bottom:58px;z-index:30;font-size:18px;font-family:'IBM Plex Mono';text-transform:uppercase;letter-spacing:.14em;color:var(--muted);display:flex;gap:14px;align-items:center;letter-spacing:.02em}
 .bug b{color:var(--ink);font-weight:600}
 .bug i{width:28px;height:2px;background:var(--gold);display:inline-block}
-.logo{position:absolute;right:150px;bottom:50px;z-index:30;font-family:'Montserrat';font-weight:800;font-size:26px;letter-spacing:-.01em;color:var(--navy)}
-.logo span{color:var(--gold)}
-body.dark .bug{color:#8ea3bb} body.dark .bug b{color:#fff} body.dark .logo{color:#fff}
+.logo{position:absolute;right:150px;bottom:44px;z-index:30;display:flex;align-items:center;gap:12px;font-family:'Archivo';font-weight:800;font-size:30px;letter-spacing:-.01em;color:var(--navy)}
+.logo svg{width:40px;height:40px}
+body.dark .bug{color:#B5D4F4} body.dark .bug b{color:#fff} body.dark .logo{color:#fff}
 
 /* entradas */
 .a{animation:up 1s var(--ease) both;animation-delay:var(--d,0s)}
@@ -91,37 +94,38 @@ body.dark .bug{color:#8ea3bb} body.dark .bug b{color:#fff} body.dark .logo{color
 @keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 .hide{visibility:hidden}
 
-.kick{font-size:24px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.kick{font-family:'IBM Plex Mono';font-size:22px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:14px}
+.kick::before{content:'';width:12px;height:12px;border-radius:50%;background:currentColor}
 h2.t{font-size:62px;font-weight:800;line-height:1.1;margin-top:22px}
 
 /* apertura / capítulo / cierre */
 .hero{font-size:112px;font-weight:800;line-height:1.02;margin-top:30px;max-width:1500px}
-.lead{font-size:40px;color:#b9c7d8;margin-top:36px;font-weight:400}
+.lead{font-size:40px;color:#B5D4F4;margin-top:36px;font-weight:400}
 .chap{display:flex;align-items:center;gap:70px}
-.chap .num{font-family:'Montserrat';font-weight:800;font-size:260px;line-height:1;color:transparent;-webkit-text-stroke:3px rgba(224,165,38,.9)}
+.chap .num{font-family:'Archivo';font-weight:800;font-size:260px;line-height:1;color:transparent;-webkit-text-stroke:3px var(--gold)}
 .chap h1{font-size:96px;font-weight:800;line-height:1.05}
 .done{width:130px;height:130px}
 .done circle{fill:none;stroke:var(--gold);stroke-width:5;stroke-dasharray:380;animation:draw 1.2s var(--ease) both;animation-delay:.2s}
 .done path{fill:none;stroke:var(--gold);stroke-width:7;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:80;animation:draw .8s var(--ease) both;animation-delay:.8s}
 @keyframes draw{from{stroke-dashoffset:var(--len,380)}to{stroke-dashoffset:0}}
-.next{margin-top:60px;font-size:30px;color:#b9c7d8;display:flex;gap:16px;align-items:center}
+.next{margin-top:60px;font-size:30px;color:#B5D4F4;display:flex;gap:16px;align-items:center}
 .next b{color:#fff;font-weight:600}
 
 /* comparar */
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:56px}
-.col{background:#fff;border-radius:6px;padding:44px 50px 48px;box-shadow:0 1px 0 var(--line),0 24px 60px -30px rgba(17,28,43,.25);border-top:5px solid var(--navy)}
+.col{background:#fff;border-radius:12px;padding:44px 50px 48px;border:1px solid var(--line);border-top:5px solid var(--navy)}
 .col .hd{display:flex;justify-content:space-between;align-items:center}
 .col .lab{font-size:22px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .col .ci{font-size:46px;color:var(--gold)}
 .col h3{font-size:52px;font-weight:800;margin-top:22px;color:var(--navy)}
-.col p{font-size:32px;line-height:1.45;margin-top:16px;color:#334155}
+.col p{font-size:32px;line-height:1.45;margin-top:16px;color:var(--muted)}
 .nota{margin-top:44px;font-size:30px;color:var(--ink);display:flex;gap:20px;align-items:center}
 .nota .bar{width:6px;align-self:stretch;background:var(--gold);border-radius:3px}
 
 /* línea de tiempo */
 .tl{margin-top:80px}
 .tl .row{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
-.mes{height:110px;border-radius:4px;background:#e7e2d7;position:relative;overflow:hidden}
+.mes{height:110px;border-radius:4px;background:var(--line2);position:relative;overflow:hidden}
 .mes i{position:absolute;inset:0;background:var(--navy);transform-origin:left}
 .mes i.on{animation:grow .7s var(--ease) both;animation-delay:var(--d,0s)}
 .mes.hl i{background:var(--gold)}
@@ -130,7 +134,7 @@ h2.t{font-size:62px;font-weight:800;line-height:1.1;margin-top:22px}
 .brk div{border:3px solid var(--gold);border-bottom:none;border-radius:8px 8px 0 0;position:relative;height:30px;align-self:end}
 .brk span{position:absolute;left:50%;bottom:44px;transform:translateX(-50%);white-space:nowrap;font-size:28px;font-weight:700;color:var(--ink)}
 .tltext{margin-top:54px;font-size:38px;font-weight:500;min-height:60px}
-.tltext.big{font-family:'Montserrat';font-weight:800;font-size:64px;color:var(--navy)}
+.tltext.big{font-family:'Archivo';font-weight:800;font-size:64px;color:var(--navy)}
 
 /* dos listas */
 .dl{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:60px}
@@ -146,13 +150,13 @@ h2.t{font-size:62px;font-weight:800;line-height:1.1;margin-top:22px}
 .facts .f{padding:18px 0}
 .facts .f span{display:block;font-size:24px;color:var(--muted);letter-spacing:.04em}
 .facts .f b{display:block;font-size:40px;font-weight:700;margin-top:4px}
-.ledger{background:#fff;border-radius:6px;padding:26px 54px 34px;box-shadow:0 1px 0 var(--line),0 24px 60px -30px rgba(17,28,43,.25)}
+.ledger{background:#fff;border-radius:12px;padding:26px 54px 34px;border:1px solid var(--line)}
 .lr{display:grid;grid-template-columns:60px 1fr auto;align-items:center;font-size:36px;padding:22px 0;border-bottom:1px solid var(--line)}
-.lr .op{font-family:'Inter';font-weight:700;color:var(--gold);font-size:40px}
+.lr .op{font-family:'IBM Plex Mono';font-weight:700;color:var(--gold);font-size:40px}
 .lr b{font-weight:700;font-variant-numeric:tabular-nums}
 .tot{display:flex;justify-content:space-between;align-items:baseline;margin-top:26px}
 .tot > span{font-size:30px;font-weight:600;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
-.tot b{font-family:'Montserrat';font-size:92px;font-weight:800;color:var(--navy)}
+.tot b{font-family:'Archivo';font-size:92px;font-weight:800;color:var(--navy)}
 .tot b small{font-size:.5em;color:var(--gold);margin-right:16px}
 .count{counter-reset:n var(--n);animation:cnt 1.6s var(--ease) both;animation-delay:var(--d,0s)}
 .count::after{content:counter(n)}
@@ -160,7 +164,7 @@ h2.t{font-size:62px;font-weight:800;line-height:1.1;margin-top:22px}
 
 /* cifra */
 .big{align-items:flex-start}
-.bignum{font-family:'Montserrat';font-weight:800;font-size:300px;line-height:1;color:var(--navy);margin-top:24px;display:flex;align-items:baseline;gap:40px}
+.bignum{font-family:'Archivo';font-weight:800;font-size:300px;line-height:1;color:var(--navy);margin-top:24px;display:flex;align-items:baseline;gap:40px}
 .bignum small{font-size:110px;color:var(--gold)}
 .big p{font-size:40px;color:var(--muted);margin-top:40px;max-width:1300px}
 
@@ -179,17 +183,17 @@ h2.t{font-size:62px;font-weight:800;line-height:1.1;margin-top:22px}
 .si2{border-top:4px solid var(--navy);padding-top:24px}
 .si2 h3{font-size:36px;font-weight:800;color:var(--navy);display:flex;gap:16px;align-items:center}
 .si2 h3 svg{color:var(--gold)}
-.si2 p{font-size:31px;line-height:1.45;margin-top:12px;color:#334155}
+.si2 p{font-size:31px;line-height:1.45;margin-top:12px;color:var(--muted)}
 
 /* preguntas */
 .qa{justify-content:flex-start;padding-top:10px}
 .qtop{display:flex;justify-content:space-between;align-items:center;height:120px}
 .q{font-size:54px;font-weight:700;line-height:1.22;margin-top:10px;max-width:1500px}
 .ops{display:grid;grid-template-columns:1fr 1fr;gap:22px 34px;margin-top:54px}
-.opt{display:flex;align-items:center;gap:26px;background:#fff;border-radius:6px;padding:28px 34px;font-size:36px;box-shadow:0 1px 0 var(--line),0 18px 40px -28px rgba(17,28,43,.3)}
-.opt .l{flex:none;width:58px;height:58px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:'Montserrat';font-weight:800;font-size:26px;color:var(--navy)}
+.opt{display:flex;align-items:center;gap:26px;background:#fff;border-radius:10px;padding:28px 34px;font-size:36px;border:1px solid var(--line)}
+.opt .l{flex:none;width:58px;height:58px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:'Archivo';font-weight:800;font-size:26px;color:var(--navy)}
 .opt.ok{background:var(--navy);color:#fff}
-.opt.ok .l{background:var(--gold);border-color:var(--gold);color:var(--navy)}
+.opt.ok .l{background:#9FE1CB;border-color:#9FE1CB;color:var(--navy)}
 .opt.ok.an{animation:okf .9s var(--ease) both;animation-delay:.1s}
 @keyframes okf{from{background:#fff;color:var(--ink)}to{background:var(--navy);color:#fff}}
 .opt.off{opacity:.35}
@@ -201,12 +205,41 @@ h2.t{font-size:62px;font-weight:800;line-height:1.1;margin-top:22px}
 .timer .bgc{stroke:var(--line)}
 .timer .fg{stroke:var(--gold);stroke-dasharray:314;stroke-linecap:round;animation:ring 5s linear both}
 @keyframes ring{from{stroke-dashoffset:0}to{stroke-dashoffset:314}}
-.timer .num{font-family:'Montserrat';font-weight:800;font-size:44px;color:var(--navy);counter-reset:n var(--n);animation:cd 5s steps(5,end) both}
+.timer .num{font-family:'Archivo';font-weight:800;font-size:44px;color:var(--navy);counter-reset:n var(--n);animation:cd 5s steps(5,end) both}
 .timer .num::after{content:counter(n)}
 @keyframes cd{from{--n:5}to{--n:0}}
 .hint{font-size:24px;color:var(--muted);margin-right:24px}
 .exp{margin-top:40px;font-size:32px;line-height:1.45;display:flex;gap:22px;max-width:1500px}
 .exp .bar{flex:none;width:6px;background:var(--gold);border-radius:3px}
+.sb{transform-box:fill-box;animation:sbh .8s var(--ease) both;animation-delay:var(--d,0s)}
+.sb.sh{transform-origin:left center}
+.sb.sv{transform-origin:center top;animation-name:sbv}
+@keyframes sbh{from{transform:scaleX(0);opacity:0}to{transform:none;opacity:1}}
+@keyframes sbv{from{transform:scaleY(0);opacity:0}to{transform:none;opacity:1}}
+.lock{display:flex;align-items:center;gap:22px}
+.lock .sym{width:76px;height:76px}
+.lock .nom{font-family:'Archivo';font-weight:800;font-size:54px;letter-spacing:-.02em;color:var(--navy);line-height:1;display:block}
+body.dark .lock .nom{color:#fff}
+.lock .baj{display:block;font-size:15px;color:var(--muted);margin-top:8px;letter-spacing:.2em}
+body.dark .lock .baj{color:#B5D4F4}
+.cover{position:absolute;inset:80px 110px;border:1px solid var(--line);border-radius:22px;background:rgba(248,247,243,.55);padding:56px 70px}
+.ctop{display:flex;justify-content:space-between;align-items:center}
+.ctop .l{display:flex;align-items:center;gap:26px}
+.pill{font-size:17px;padding:10px 18px;border:1px solid var(--sky);border-radius:10px;color:var(--navy2);background:#EAF2FB}
+.pill.r{border-color:var(--line);background:#fff;color:var(--muted);border-radius:30px}
+.cmain{position:absolute;left:70px;right:70px;top:230px;bottom:70px;display:grid;grid-template-columns:1.1fr .9fr;gap:70px;align-items:center}
+.cmain .hero{font-size:92px;color:var(--navy);margin-top:26px;line-height:1.04}
+.cmain .lead{color:var(--muted);font-size:34px;margin-top:28px}
+.chips{display:flex;gap:14px;margin-top:40px;flex-wrap:wrap}
+.chip{font-size:24px;padding:12px 22px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+.art{height:100%;background:#fff;border:1px solid var(--line);border-radius:18px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.art::before{content:'';position:absolute;left:0;right:0;top:0;height:8px;background:linear-gradient(90deg,#0C447C,#1D9E75,#B5D4F4)}
+.art .sym{width:380px;height:380px}
+.end{display:grid;grid-template-columns:auto 1fr;gap:80px;align-items:center}
+.end .sym{width:300px;height:300px}
+.endlock{position:absolute;left:150px;bottom:80px}
+.endlock .sym{width:56px;height:56px}
+.endlock .nom{font-size:40px}
 """
 
 CLOCK_JS = """<script>
@@ -224,15 +257,36 @@ window.__end = () => Math.max(0, ...document.getAnimations()
 </script>"""
 
 
-def page(body, dark, les, grain_uri):
+SIMBOLO = [  # geometría oficial de la "Ese modular" (viewBox 40x40): x, y, ancho, alto, color claro, color sobre azul
+    (6, 5, 28, 8, "#0C447C", "#FFFFFF"), (6, 5, 8, 19, "#0C447C", "#FFFFFF"),
+    (6, 16, 28, 8, "#1D9E75", "#9FE1CB"), (26, 16, 8, 19, "#1D9E75", "#9FE1CB"),
+    (6, 27, 28, 8, "#B5D4F4", "#B5D4F4")]
+
+
+def simbolo(dark=False, anim=False, d0=0.0, cls="sym"):
+    rects = ""
+    for i, (x, y, w, h, c, cd) in enumerate(SIMBOLO):
+        a = f' class="sb {"sv" if h > w else "sh"}" style="--d:{d0 + .12*i:.2f}s"' if anim else ""
+        rects += f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="4" fill="{cd if dark else c}"{a}/>'
+    return f'<svg class="{cls}" viewBox="0 0 40 40">{rects}</svg>'
+
+
+def lockup(dark=False, anim=False, d0=0.0, bajada=False):
+    b = '<span class="baj mono">Seguridad · Gestión · Análisis</span>' if bajada else ""
+    return (f'<div class="lock{" a" if anim else ""}" style="--d:{d0:.2f}s">{simbolo(dark, anim, d0 + .1)}'
+            f'<div><span class="nom">Segania</span>{b}</div></div>')
+
+
+def page(body, dark, les, grain_uri, marca=True):
     css = CSS.replace("GRAIN", grain_uri)
-    bug = f'<div class="bug"><i></i><b>Lección {esc(les["id"])}</b>{esc(les["titulo"])}</div>'
+    bug = f'<div class="bug"><i></i><b>Lección {esc(les["id"])}</b>{esc(les["titulo"])}</div>' if marca else ""
+    logo = f'<div class="logo">{simbolo(dark)}Segania</div>' if marca else ""
     return f"""<!doctype html><html lang="es"><head><meta charset="utf-8">
 <link rel="stylesheet" href="{FONTS_CSS}"><style>{css}</style>{CLOCK_JS}</head>
 <body class="{'dark' if dark else ''}">
 <div class="bg"><div class="blob b1" data-clock="g"></div><div class="blob b2" data-clock="g"></div></div>
 <div class="cam" data-clock="s">{body}</div>
-{bug}<div class="logo">segania<span>.</span></div><div class="grain" data-clock="g"></div>
+{bug}{logo}<div class="grain" data-clock="g"></div>
 </body></html>"""
 
 
@@ -255,13 +309,16 @@ def pasos_de(les):
         t = e["tipo"]
         voces = e.get("voz") if isinstance(e.get("voz"), list) else [e.get("voz")]
 
-        def add(body, voz, dark=False, fijo=None):
-            out.append(dict(body=body, voz=voz, dark=dark, fijo=fijo, escena=si))
+        def add(body, voz, dark=False, fijo=None, marca=True):
+            out.append(dict(body=body, voz=voz, dark=dark, fijo=fijo, escena=si, marca=marca))
 
         if t == "apertura":
-            add(f"""<div class="stage"><div class="kick a" style="--d:.3s">{esc(les['modulo'])} · Lección {esc(les['id'])}</div>
-<h1 class="hero">{H(e['titulo'], True, .5, .09)}</h1><div class="rule g" style="--d:1.1s;margin-top:40px"></div>
-<p class="lead a" style="--d:1.3s">{esc(e['subtitulo'])}</p></div>""", voces[0], dark=True)
+            chips = "".join(f'<span class="chip a" style="--d:{1.5 + .1*i:.2f}s">{esc(c)}</span>' for i, c in enumerate(e.get("etiquetas", [])))
+            add(f"""<div class="cover"><div class="ctop"><div class="l">{lockup(False, True, .2)}<span class="pill mono a" style="--d:.9s">Cursos oficiales</span></div>
+<span class="pill r mono a" style="--d:1s">Curso 1 · Lección {esc(les['id'])}</span></div>
+<div class="cmain"><div><div class="kick a" style="--d:1s">{esc(les['modulo'])}</div>
+<h1 class="hero">{H(e['titulo'], True, 1.1, .08)}</h1><p class="lead a" style="--d:1.4s">{esc(e['subtitulo'])}</p><div class="chips">{chips}</div></div>
+<div class="art as" style="--d:.6s">{simbolo(False, True, 1.0)}</div></div></div>""", voces[0], marca=False)
 
         elif t == "capitulo":
             add(f"""<div class="stage"><div class="chap"><div class="num as" style="--d:.1s">{esc(e['numero'])}</div>
@@ -300,13 +357,13 @@ def pasos_de(les):
                     hl = rango and rango[0] <= i <= rango[1]
                     nuevo_hl = hl and antes.get("rango") != rango
                     if first and not hl:
-                        fill = f'<i class="on" style="--d:{.4 + .05*i:.2f}s;background:#c9c1ae"></i>'
+                        fill = f'<i class="on" style="--d:{.4 + .05*i:.2f}s;background:var(--sky)"></i>'
                     elif first and hl:
                         fill = f'<i class="on" style="--d:{.4 + .05*i:.2f}s"></i>'
                     elif nuevo_hl:
                         fill = f'<i class="on" style="--d:{.1 + .06*(i-rango[0]):.2f}s"></i>'
                     else:
-                        fill = '<i></i>' if hl else '<i style="background:#c9c1ae"></i>'
+                        fill = '<i></i>' if hl else '<i style="background:var(--sky)"></i>'
                     meses += f'<div class="mes{" hl" if hl and not first else ""}">{fill}</div>'
                 brk = '<div class="brk">'
                 if rango:
@@ -409,10 +466,12 @@ def pasos_de(les):
             add(q("respuesta"), e["voz_respuesta"])
 
         elif t == "cierre":
-            add(f"""<div class="stage"><svg class="done" viewBox="0 0 130 130"><circle cx="65" cy="65" r="60" style="--len:380"/><path d="M40 67 l17 17 l34 -36" style="--len:80"/></svg>
-<h1 class="hero" style="font-size:100px">{H(e['titulo'], True, .6, .1)}</h1>
-<p class="lead a" style="--d:1.1s">{esc(e['texto'])}</p>
-<div class="next a" style="--d:1.4s">{ic('arrow-right')} Siguiente: <b>{esc(les['siguiente'])}</b></div></div>""", voces[0], dark=True)
+            add(f"""<div class="stage"><div class="end">{simbolo(True, True, .3)}<div>
+<div class="kick a" style="--d:.9s">Lección {esc(les['id'])} completada</div>
+<h1 class="hero" style="font-size:96px">{H(e['titulo'], True, 1.0, .1)}</h1>
+<p class="lead a" style="--d:1.4s">{esc(e['texto'])}</p>
+<div class="next a" style="--d:1.7s">{ic('arrow-right')} Siguiente: <b>{esc(les['siguiente'])}</b></div></div></div></div>
+<div class="endlock a" style="--d:2s">{lockup(True, False, 0, True)}</div>""", voces[0], dark=True, marca=False)
         else:
             raise ValueError(t)
     for i, p in enumerate(out):
@@ -576,7 +635,7 @@ def main():
     htmls = []
     for i, p in enumerate(pasos):
         f = work / f"p{i:03}.html"
-        f.write_text(page(p["body"], p["dark"], les, grain))
+        f.write_text(page(p["body"], p["dark"], les, grain, p["marca"]))
         htmls.append(f.as_uri())
 
     if a.muestras:
